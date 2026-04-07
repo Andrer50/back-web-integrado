@@ -37,7 +37,7 @@ import java.util.UUID;
         @Column(name = "last_name", nullable = false)
         private String lastName;
 
-        @Column(name = "birth_date", nullable = false)
+        @Column(name = "birth_date")
         private LocalDate birthDate;
 
         @Column(name = "phone")
