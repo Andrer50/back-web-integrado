@@ -1,0 +1,15 @@
+server:
+  port: 8082
+spring:
+  datasource:
+    url: jdbc:postgresql://dpg-d7aj49muk2gs73ch6fng-a.oregon-postgres.render.com:5432/business_2p48
+    username: user
+    password: Cr2jumaKuWYeDdWeL3qPWH7kMo0DzFu5
+  jpa:
+    hibernate:
+      ddl-auto: update   # create, create-drop, update, validate, none
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+    show-sql: false
