@@ -13,4 +13,6 @@ public class PatientRegisterResponse {
     private String documentNumber;
     private String firstName;
     private String lastName;
+    private String createdAt;
+    private String updatedAt;
 }
