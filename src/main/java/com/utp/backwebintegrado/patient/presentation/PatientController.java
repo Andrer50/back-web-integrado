@@ -1,9 +1,9 @@
 package com.utp.backwebintegrado.patient.presentation;
 
 import com.utp.backwebintegrado.patient.application.PatientService;
-import com.utp.backwebintegrado.patient.application.dto.PatientRegisterRequest;
+import com.utp.backwebintegrado.patient.application.dto.PatientRequest;
 import com.utp.backwebintegrado.shared.dto.ApiResponse;
-import com.utp.backwebintegrado.patient.application.dto.PatientRegisterResponse;
+import com.utp.backwebintegrado.patient.application.dto.PatientResponse;
 import com.utp.backwebintegrado.shared.utility.ConstantUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -20,8 +20,8 @@ public class PatientController {
     private final PatientService patientService;
 
     @PostMapping
-    public ResponseEntity<ApiResponse<PatientRegisterResponse>> create(@RequestBody PatientRegisterRequest request) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.<PatientRegisterResponse>builder()
+    public ResponseEntity<ApiResponse<PatientResponse>> create(@RequestBody PatientRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.<PatientResponse>builder()
                 .code(ConstantUtil.OK_CODE)
                 .message(ConstantUtil.OK_MESSAGE)
                 .data(patientService.createPatient(request))

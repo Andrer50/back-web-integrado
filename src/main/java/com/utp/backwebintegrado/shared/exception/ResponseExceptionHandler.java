@@ -50,14 +50,13 @@ public class ResponseExceptionHandler {
 
     }
     @ExceptionHandler(MissingServletRequestPartException.class)
-    public ResponseEntity<ApiExceptionResponse> missingServletRequestPartException(
-            MissingServletRequestPartException exception) {
-        return ResponseEntity.ok()
-                .body(ApiExceptionResponse.builder()
-                        .code(ConstantUtil.ERROR_CODE)
-                        .message(exception.getMessage())
+    public ResponseEntity<ApiResponse<Void>> handleMissing(
+            MissingServletRequestPartException ex) {
+        return ResponseEntity.badRequest()
+                .body(ApiResponse.<Void>builder()
+                        .code("400")
+                        .message("Falta el campo: " + ex.getRequestPartName())
                         .build());
-
     }
     @ExceptionHandler(MaxUploadSizeExceededException.class)
     public ResponseEntity<ApiExceptionResponse> maxUploadSizeExceededException(

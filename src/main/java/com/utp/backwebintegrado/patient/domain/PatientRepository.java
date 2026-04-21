@@ -11,4 +11,5 @@ public interface PatientRepository {
     boolean existsByDocumentNumber(String documentNumber);
     boolean existsByUserId(UUID userId);
     void deleteById(UUID id);
+
 }

@@ -1,11 +1,15 @@
 package com.utp.backwebintegrado.patient.application.dto;
 
+import lombok.Builder;
 import lombok.Data;
 
 import java.time.LocalDate;
+import java.util.UUID;
 
 @Data
-public class PatientRegisterResponse {
+@Builder
+public class PatientResponse {
+    private UUID id;
     private String email;
     private String password;
     private String phone;

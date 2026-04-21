@@ -11,7 +11,7 @@ import java.time.LocalDate;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class PatientRegisterRequest {
+public class PatientRequest {
     private String firstName;
     private String lastName;
     private String email;

@@ -1,6 +1,5 @@
 package com.utp.backwebintegrado.user.infrastructure;
 
-import com.utp.backwebintegrado.patient.application.dto.PatientRegisterRequest;
 import com.utp.backwebintegrado.user.domain.User;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
