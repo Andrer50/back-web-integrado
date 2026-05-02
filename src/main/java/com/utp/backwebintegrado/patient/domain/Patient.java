@@ -3,6 +3,7 @@ package com.utp.backwebintegrado.patient.domain;
 
 import com.github.f4b6a3.uuid.UuidCreator;
 import com.utp.backwebintegrado.user.domain.User;
+import com.utp.backwebintegrado.shared.enumeration.Gender;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -39,8 +40,15 @@ public class Patient {
     @Column(name = "birth_date")
     private LocalDate birthDate;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "gender")
+    private Gender gender;
+
     @Column(name = "phone")
     private String phone;
+
+    @Column(name = "address")
+    private String address;
 
     @Column(name = "medical_history", columnDefinition = "TEXT")
     private String medicalHistory;

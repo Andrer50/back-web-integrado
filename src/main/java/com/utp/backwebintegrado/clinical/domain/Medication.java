@@ -7,22 +7,26 @@ import lombok.*;
 import java.util.UUID;
 
 @Entity
-@Table(name = "diagnoses")
+@Table(name = "medications")
 @Getter
 @Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Diagnosis {
+public class Medication {
     @Id
     @Column(name = "id", updatable = false, nullable = false)
     private UUID id;
 
-    @Column(nullable = false, unique = true)
-    private String icd10;
+    @Column(nullable = false)
+    private String name;
 
-    @Column(nullable = false, columnDefinition = "TEXT")
-    private String description;
+    private String brand;
+    
+    private String concentration;
+    
+    @Column(name = "pharmaceutical_form")
+    private String pharmaceuticalForm; // e.g., Tablet, Syrup
 
     @PrePersist
     public void generateId() {

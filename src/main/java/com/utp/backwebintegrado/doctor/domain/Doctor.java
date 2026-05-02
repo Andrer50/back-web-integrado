@@ -25,8 +25,16 @@ public class Doctor {
     @JoinColumn(name = "user_id", unique = true)
     private User user;
 
-    @Column(nullable = false)
-    private String specialty; // Ej: Pediatría, Cardiología
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+        name = "doctor_specialties",
+        joinColumns = @JoinColumn(name = "doctor_id"),
+        inverseJoinColumns = @JoinColumn(name = "specialty_id")
+    )
+    private java.util.Set<Specialty> specialties;
+
+    @Column(columnDefinition = "TEXT")
+    private String bio;
 
     // Número de colegiatura médica (ej. CMP)
     @Column(name = "medical_license_number", nullable = false, unique = true)

@@ -1,45 +1,42 @@
 package com.utp.backwebintegrado.clinical.domain;
 
 import com.github.f4b6a3.uuid.UuidCreator;
+import com.utp.backwebintegrado.appointment.domain.Appointment;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.UUID;
 
 @Entity
-@Table(name = "prescriptions")
+@Table(name = "consultations")
 @Getter
 @Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Prescription {
+public class Consultation {
     @Id
     @Column(name = "id", updatable = false, nullable = false)
     private UUID id;
 
     @OneToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "consultation_id", unique = true)
-    private Consultation consultation;
-
-    @Column(name = "issue_date", nullable = false)
-    private LocalDateTime issueDate;
+    @JoinColumn(name = "appointment_id", unique = true)
+    private Appointment appointment;
 
     @Column(columnDefinition = "TEXT")
     private String notes;
 
-    @OneToMany(mappedBy = "prescription", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<PrescriptionItem> items;
+    @Column(name = "created_at", nullable = false)
+    private LocalDateTime createdAt;
 
     @PrePersist
     public void generateId() {
         if (this.id == null) {
             this.id = UuidCreator.getTimeOrderedEpoch();
         }
-        if (this.issueDate == null) {
-            this.issueDate = LocalDateTime.now();
+        if (this.createdAt == null) {
+            this.createdAt = LocalDateTime.now();
         }
     }
 }

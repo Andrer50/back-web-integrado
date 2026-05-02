@@ -1,35 +1,37 @@
 package com.utp.backwebintegrado.clinical.domain;
 
 import com.github.f4b6a3.uuid.UuidCreator;
-import com.utp.backwebintegrado.shared.enumeration.DiagnosisType;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.UUID;
 
 @Entity
-@Table(name = "consultation_diagnoses")
+@Table(name = "prescription_items")
 @Getter
 @Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ConsultationDiagnosis {
+public class PrescriptionItem {
     @Id
     @Column(name = "id", updatable = false, nullable = false)
     private UUID id;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "consultation_id", nullable = false)
-    private Consultation consultation;
+    @JoinColumn(name = "prescription_id", nullable = false)
+    private Prescription prescription;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "diagnosis_id", nullable = false)
-    private Diagnosis diagnosis;
+    @JoinColumn(name = "medication_id", nullable = false)
+    private Medication medication;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private DiagnosisType type;
+    private String dosage;
+    private String frequency;
+    private String duration;
+    
+    @Column(columnDefinition = "TEXT")
+    private String instructions;
 
     @PrePersist
     public void generateId() {
