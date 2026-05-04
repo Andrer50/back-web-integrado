@@ -3,6 +3,8 @@ package com.utp.backwebintegrado.patient.infrastructure;
 import com.utp.backwebintegrado.patient.domain.Patient;
 import com.utp.backwebintegrado.patient.domain.PatientRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -29,6 +31,11 @@ public class PatientRepositoryImpl implements PatientRepository {
     @Override
     public List<Patient> findAll() {
         return jpaRepository.findAll();
+    }
+
+    @Override
+    public Page<Patient> findAll(String query, String status, Pageable pageable) {
+        return jpaRepository.searchPatients(query, status, pageable);
     }
 
     @Override

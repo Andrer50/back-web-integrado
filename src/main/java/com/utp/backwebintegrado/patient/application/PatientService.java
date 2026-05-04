@@ -14,6 +14,8 @@ import com.utp.backwebintegrado.user.domain.User;
 import com.utp.backwebintegrado.user.domain.UserRepository;
 import com.utp.backwebintegrado.user.infrastructure.UserMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -65,6 +67,11 @@ public class PatientService {
         return patientRepository.findAll().stream()
                 .map(patientMapper::toResponse) // De Dominio/Entity a DTO
                 .collect(Collectors.toList());
+    }
+
+    public Page<PatientResponse> findAllPaginated(String query, String status, Pageable pageable) {
+        return patientRepository.findAll(query, status, pageable)
+                .map(patientMapper::toResponse);
     }
 
     // CORREGIDO: Usa UUID, patientRepository y mapea a DTO

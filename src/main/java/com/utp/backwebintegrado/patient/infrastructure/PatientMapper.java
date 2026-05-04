@@ -13,5 +13,7 @@ public interface PatientMapper {
     @Mapping(target = "id", ignore = true) // Lo genera el @PrePersist
     Patient toEntity(PatientRequest request, User user);
 
+    @Mapping(target = "email", source = "user.email")
+    @Mapping(target = "status", source = "user.status")
     PatientResponse toResponse(Patient patient);
 }
