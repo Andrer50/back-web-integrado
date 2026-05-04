@@ -24,7 +24,7 @@ public class Patient {
 
     // Relación 1 a 1 con tu entidad User de Auth
 
-    @OneToOne(optional = false, fetch = FetchType.LAZY)
+    @OneToOne(optional = false, fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     @JoinColumn(name = "user_id", unique = true)
     private User user;
 

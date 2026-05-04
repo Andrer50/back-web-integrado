@@ -46,9 +46,9 @@ public class PatientService {
 
         // Mapper convierte Request → Entity
         User shadowUser = userMapper.toEntity(request, userId, Role.PATIENT.name());
-        userRepository.save(shadowUser);
+        User savedUser = userRepository.save(shadowUser);
 
-        Patient patient = patientMapper.toEntity(request, shadowUser);
+        Patient patient = patientMapper.toEntity(request, savedUser);
         Patient saved = patientRepository.save(patient);
 
         // Llama auth al final
