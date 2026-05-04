@@ -1,5 +1,6 @@
 package com.utp.backwebintegrado.patient.application.dto;
 
+import com.utp.backwebintegrado.shared.enumeration.Gender;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -19,4 +20,6 @@ public class PatientRequest {
     private String phone;
     private LocalDate birthDate;
     private String documentNumber;
+    private Gender gender;
+    private String address;
 }
