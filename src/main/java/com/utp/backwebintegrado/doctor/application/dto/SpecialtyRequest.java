@@ -6,14 +6,11 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.UUID;
-
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class SpecialtyResponse {
-    private UUID id;
+public class SpecialtyRequest {
     private String name;
     private String description;
     private Status status;
