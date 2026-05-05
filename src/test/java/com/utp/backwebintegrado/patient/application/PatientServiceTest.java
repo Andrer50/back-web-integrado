@@ -4,7 +4,7 @@ import com.utp.backwebintegrado.patient.application.dto.PatientRequest;
 import com.utp.backwebintegrado.patient.application.dto.PatientResponse;
 import com.utp.backwebintegrado.patient.domain.Patient;
 import com.utp.backwebintegrado.patient.domain.PatientRepository;
-import com.utp.backwebintegrado.patient.infrastructure.PatientMapper;
+import com.utp.backwebintegrado.patient.infrastructure.mapper.PatientMapper;
 import com.utp.backwebintegrado.shared.client.AuthClient;
 import com.utp.backwebintegrado.shared.exception.ApiValidateException;
 import com.utp.backwebintegrado.shared.exception.ServiceUnavailableException;
@@ -103,7 +103,7 @@ class PatientServiceTest {
                     .willReturn(false);
 
             // Simula el mapper
-            given(userMapper.toEntity(any(), any(), any()))
+            given(userMapper.toEntity(any(PatientRequest.class), any(UUID.class), anyString()))
                     .willReturn(shadowUser);
             given(patientMapper.toEntity(any(), any()))
                     .willReturn(savedPatient);
@@ -177,7 +177,7 @@ class PatientServiceTest {
                     .willReturn(false);
             given(userRepository.existsByEmail(any()))
                     .willReturn(false);
-            given(userMapper.toEntity(any(), any(),any()))
+            given(userMapper.toEntity(any(PatientRequest.class), any(UUID.class), anyString()))
                     .willReturn(shadowUser);
             given(patientMapper.toEntity(any(), any()))
                     .willReturn(savedPatient);

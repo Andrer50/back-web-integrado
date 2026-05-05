@@ -39,6 +39,15 @@ public class Doctor {
     // Número de colegiatura médica (ej. CMP)
     @Column(name = "medical_license_number", nullable = false, unique = true)
     private String medicalLicenseNumber;
+
+    @Column(name = "first_name", nullable = false)
+    private String firstName;
+
+    @Column(name = "last_name", nullable = false)
+    private String lastName;
+
+    @Column(name = "phone")
+    private String phone;
     @PrePersist
     public void generateId() {
         if (this.id == null) {

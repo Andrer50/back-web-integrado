@@ -1,4 +1,4 @@
-package com.utp.backwebintegrado.doctor.infrastructure;
+package com.utp.backwebintegrado.doctor.infrastructure.mapper;
 
 import com.utp.backwebintegrado.doctor.application.dto.SpecialtyRequest;
 import com.utp.backwebintegrado.doctor.application.dto.SpecialtyResponse;

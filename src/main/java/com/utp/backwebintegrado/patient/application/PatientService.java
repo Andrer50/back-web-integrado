@@ -3,7 +3,7 @@ package com.utp.backwebintegrado.patient.application;
 import com.github.f4b6a3.uuid.UuidCreator;
 import com.utp.backwebintegrado.patient.domain.Patient;
 import com.utp.backwebintegrado.patient.domain.PatientRepository;
-import com.utp.backwebintegrado.patient.infrastructure.PatientMapper;
+import com.utp.backwebintegrado.patient.infrastructure.mapper.PatientMapper;
 import com.utp.backwebintegrado.patient.application.dto.PatientRequest;
 import com.utp.backwebintegrado.patient.application.dto.PatientResponse;
 import com.utp.backwebintegrado.shared.client.AuthClient;

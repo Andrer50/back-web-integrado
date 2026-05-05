@@ -13,7 +13,7 @@ import java.util.UUID;
 public interface SpecialtyJpaRepository extends JpaRepository<Specialty, UUID> {
     
     @Query("SELECT s FROM Specialty s WHERE " +
-           "(:query IS NULL OR LOWER(s.name) LIKE LOWER(CONCAT('%', :query, '%'))) AND " +
+           "(:query IS NULL OR LOWER(s.name) LIKE LOWER(CONCAT('%', CAST(:query AS string), '%'))) AND " +
            "(:status IS NULL OR s.status = :status)")
     Page<Specialty> searchSpecialties(@Param("query") String query, 
                                      @Param("status") Status status, 

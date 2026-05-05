@@ -4,7 +4,7 @@ import com.utp.backwebintegrado.doctor.application.dto.SpecialtyRequest;
 import com.utp.backwebintegrado.doctor.application.dto.SpecialtyResponse;
 import com.utp.backwebintegrado.doctor.domain.Specialty;
 import com.utp.backwebintegrado.doctor.domain.SpecialtyRepository;
-import com.utp.backwebintegrado.doctor.infrastructure.SpecialtyMapper;
+import com.utp.backwebintegrado.doctor.infrastructure.mapper.SpecialtyMapper;
 import com.utp.backwebintegrado.shared.exception.ApiValidateException;
 import com.utp.backwebintegrado.shared.enumeration.Status;
 import lombok.RequiredArgsConstructor;

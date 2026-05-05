@@ -1,4 +1,4 @@
-package com.utp.backwebintegrado.patient.infrastructure;
+package com.utp.backwebintegrado.patient.infrastructure.mapper;
 
 import com.utp.backwebintegrado.patient.application.dto.PatientRequest;
 import com.utp.backwebintegrado.patient.application.dto.PatientResponse;
