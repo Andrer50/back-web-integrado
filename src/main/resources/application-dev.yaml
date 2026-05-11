@@ -2,9 +2,9 @@ server:
   port: 8082
 spring:
   datasource:
-    url: jdbc:postgresql://dpg-d7aj49muk2gs73ch6fng-a.oregon-postgres.render.com:5432/business_2p48
-    username: user
-    password: Cr2jumaKuWYeDdWeL3qPWH7kMo0DzFu5
+    url: jdbc:postgresql://dpg-d811r0u7r5hc73c3h6ig-a.oregon-postgres.render.com:5432/buss_cdlh
+    username: mediconnect_user
+    password: Qgak155683CuJItyT54nXIC7wG0hBFnO
   jpa:
     hibernate:
       ddl-auto: update   # create, create-drop, update, validate, none
