@@ -13,6 +13,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.UUID;
+
 @RestController
 @RequestMapping("/api/v1/patients")
 @RequiredArgsConstructor
@@ -30,6 +32,7 @@ public class PatientController {
 
     @GetMapping
     public ResponseEntity<ApiResponse<Page<PatientResponse>>> findAll(
+            @RequestParam(required = false) UUID userId,
             @RequestParam(required = false) String query,
             @RequestParam(required = false) String status,
             @RequestParam(defaultValue = "0") int page,
@@ -39,7 +42,7 @@ public class PatientController {
         return ResponseEntity.ok(ApiResponse.<Page<PatientResponse>>builder()
                 .code(ConstantUtil.OK_CODE)
                 .message(ConstantUtil.OK_MESSAGE)
-                .data(patientService.findAllPaginated(query, status, pageable))
+                .data(patientService.findAllPaginated(userId, query, status, pageable))
                 .build());
     }
 }

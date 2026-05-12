@@ -11,7 +11,7 @@ public interface PatientRepository {
     Patient save(Patient patient);
     Optional<Patient> findById(UUID id);
     List<Patient> findAll();
-    Page<Patient> findAll(String query, String status, Pageable pageable);
+    Page<Patient> findAll(UUID userId, String query, String status, Pageable pageable);
     boolean existsByDocumentNumber(String documentNumber);
     boolean existsByUserId(UUID userId);
     void deleteById(UUID id);

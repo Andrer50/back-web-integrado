@@ -34,8 +34,8 @@ public class PatientRepositoryImpl implements PatientRepository {
     }
 
     @Override
-    public Page<Patient> findAll(String query, String status, Pageable pageable) {
-        return jpaRepository.searchPatients(query, status, pageable);
+    public Page<Patient> findAll(UUID userId, String query, String status, Pageable pageable) {
+        return jpaRepository.searchPatients(userId, query, status, pageable);
     }
 
     @Override

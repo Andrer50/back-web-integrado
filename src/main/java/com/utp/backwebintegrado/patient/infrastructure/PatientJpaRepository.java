@@ -14,9 +14,16 @@ public interface PatientJpaRepository extends JpaRepository<Patient, UUID> {
     boolean existsByUserId(UUID userId);
 
     @Query("SELECT p FROM Patient p JOIN p.user u WHERE " +
-           "(:query IS NULL OR LOWER(p.firstName) LIKE LOWER(CONCAT('%', :query, '%')) OR " +
-           "LOWER(p.lastName) LIKE LOWER(CONCAT('%', :query, '%')) OR " +
-           "p.documentNumber LIKE CONCAT('%', :query, '%')) AND " +
+           "(:userId IS NULL OR u.id = :userId) AND " +
+           "(:query IS NULL OR LOWER(p.firstName) LIKE LOWER(CONCAT('%', CAST(:query AS string), '%')) OR " +
+           "LOWER(p.lastName) LIKE LOWER(CONCAT('%', CAST(:query AS string), '%')) OR " +
+           "p.documentNumber LIKE CONCAT('%', CAST(:query AS string), '%') OR " +
+           "LOWER(u.email) = LOWER(CAST(:query AS string))) AND " +
            "(:status IS NULL OR u.status = :status)")
-    Page<Patient> searchPatients(@Param("query") String query, @Param("status") String status, Pageable pageable);
+    Page<Patient> searchPatients(
+            @Param("userId") UUID userId,
+            @Param("query") String query,
+            @Param("status") String status,
+            Pageable pageable
+    );
 }

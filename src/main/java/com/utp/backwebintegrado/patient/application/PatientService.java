@@ -69,8 +69,8 @@ public class PatientService {
                 .collect(Collectors.toList());
     }
 
-    public Page<PatientResponse> findAllPaginated(String query, String status, Pageable pageable) {
-        return patientRepository.findAll(query, status, pageable)
+    public Page<PatientResponse> findAllPaginated(UUID userId, String query, String status, Pageable pageable) {
+        return patientRepository.findAll(userId, query, status, pageable)
                 .map(patientMapper::toResponse);
     }
 
