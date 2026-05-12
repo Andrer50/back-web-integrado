@@ -44,6 +44,10 @@ public class Appointment {
 
     @Column(name = "reason", columnDefinition = "TEXT")
     private String reason;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "slot_id", unique = true)
+    private DoctorScheduleSlot scheduleSlot;
     @PrePersist
     public void generateId() {
         if (this.id == null) {
