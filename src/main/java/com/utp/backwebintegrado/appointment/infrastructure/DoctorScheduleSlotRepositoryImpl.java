@@ -37,6 +37,11 @@ public class DoctorScheduleSlotRepositoryImpl implements DoctorScheduleSlotRepos
     }
 
     @Override
+    public List<DoctorScheduleSlot> findByDoctorIdAndStartDate(UUID doctorId, LocalDate startDate) {
+        return jpaRepository.findByDoctorIdAndStartDate(doctorId, startDate);
+    }
+
+    @Override
     public void deleteById(UUID id) {
         jpaRepository.deleteById(id);
     }

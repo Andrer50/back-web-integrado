@@ -150,6 +150,14 @@ public class ScheduleService {
         return responseList;
     }
 
+    public List<DoctorScheduleSlotResponse> findSlotsByDoctor(UUID doctorId, LocalDate startDate) {
+        LocalDate start = startDate != null ? startDate : LocalDate.now().minusDays(1); // Muestra slots de hoy también
+        List<DoctorScheduleSlot> slots = slotRepository.findByDoctorIdAndStartDate(doctorId, start);
+        return slots.stream()
+                .map(slotMapper::toResponse)
+                .collect(Collectors.toList());
+    }
+
     private String capitalize(String text) {
         if (text == null || text.isEmpty()) return text;
         return text.substring(0, 1).toUpperCase() + text.substring(1).toLowerCase();

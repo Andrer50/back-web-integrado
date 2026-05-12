@@ -19,7 +19,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/v1/schedules")
 @RequiredArgsConstructor
-public class ScheduleController {
+public class    ScheduleController {
 
     private final ScheduleService scheduleService;
 
@@ -43,6 +43,18 @@ public class ScheduleController {
                 .code(ConstantUtil.OK_CODE)
                 .message(ConstantUtil.OK_MESSAGE)
                 .data(scheduleService.findAvailableSlotsGrouped(specialtyId, branchId, startDate, endDate))
+                .build());
+    }
+
+    @GetMapping("/doctor/{doctorId}")
+    public ResponseEntity<ApiResponse<List<DoctorScheduleSlotResponse>>> getSlotsByDoctor(
+            @PathVariable UUID doctorId,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate
+    ) {
+        return ResponseEntity.ok(ApiResponse.<List<DoctorScheduleSlotResponse>>builder()
+                .code(ConstantUtil.OK_CODE)
+                .message(ConstantUtil.OK_MESSAGE)
+                .data(scheduleService.findSlotsByDoctor(doctorId, startDate))
                 .build());
     }
 }

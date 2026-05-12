@@ -28,4 +28,13 @@ public interface DoctorScheduleSlotJpaRepository extends JpaRepository<DoctorSch
             @Param("startDate") LocalDate startDate,
             @Param("endDate") LocalDate endDate
     );
+
+    @Query("SELECT s FROM DoctorScheduleSlot s " +
+           "WHERE s.doctor.id = :doctorId " +
+           "AND s.slotDate >= :startDate " +
+           "ORDER BY s.slotDate ASC, s.startTime ASC")
+    List<DoctorScheduleSlot> findByDoctorIdAndStartDate(
+            @Param("doctorId") UUID doctorId,
+            @Param("startDate") LocalDate startDate
+    );
 }
