@@ -66,9 +66,11 @@ public class PatientController {
                 .build());
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<ApiResponse<Void>> softDelete(@PathVariable UUID id) {
-        patientService.softDeletePatient(id);
+    @PatchMapping("/{id}/status")
+    public ResponseEntity<ApiResponse<Void>> changeStatus(
+            @PathVariable UUID id,
+            @RequestParam String status) {
+        patientService.changePatientStatus(id, status);
         return ResponseEntity.ok(ApiResponse.<Void>builder()
                 .code(ConstantUtil.OK_CODE)
                 .message(ConstantUtil.OK_MESSAGE)

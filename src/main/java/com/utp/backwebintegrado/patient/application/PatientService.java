@@ -86,13 +86,17 @@ public class PatientService {
         return patientMapper.toResponse(updated);
     }
 
-    // Metodo para desactivar paciente
+    // Metodo para desactivar/activar paciente
     @Transactional(rollbackFor = Exception.class)
-    public void softDeletePatient(UUID id) {
+    public void changePatientStatus(UUID id, String newStatus) {
         Patient patient = patientRepository.findById(id)
                 .orElseThrow(() -> new ApiValidateException("Paciente no encontrado con ID: " + id));
 
-        patient.getUser().setStatus("INACTIVE");
+        if (!newStatus.equals("ACTIVE") && !newStatus.equals("INACTIVE")) {
+            throw new ApiValidateException("Status debe ser ACTIVE o INACTIVE");
+        }
+
+        patient.getUser().setStatus(newStatus);
         userRepository.save(patient.getUser());
     }
 
