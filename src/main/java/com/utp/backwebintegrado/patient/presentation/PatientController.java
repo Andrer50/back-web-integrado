@@ -30,6 +30,26 @@ public class PatientController {
                 .build());
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<ApiResponse<PatientResponse>> update(
+            @PathVariable UUID id,
+            @RequestBody PatientRequest request) {
+        return ResponseEntity.ok(ApiResponse.<PatientResponse>builder()
+                .code(ConstantUtil.OK_CODE)
+                .message(ConstantUtil.OK_MESSAGE)
+                .data(patientService.updatePatient(id, request))
+                .build());
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<ApiResponse<PatientResponse>> findById(@PathVariable UUID id) {
+        return ResponseEntity.ok(ApiResponse.<PatientResponse>builder()
+                .code(ConstantUtil.OK_CODE)
+                .message(ConstantUtil.OK_MESSAGE)
+                .data(patientService.findById(id))
+                .build());
+    }
+
     @GetMapping
     public ResponseEntity<ApiResponse<Page<PatientResponse>>> findAll(
             @RequestParam(required = false) UUID userId,
@@ -43,6 +63,15 @@ public class PatientController {
                 .code(ConstantUtil.OK_CODE)
                 .message(ConstantUtil.OK_MESSAGE)
                 .data(patientService.findAllPaginated(userId, query, status, pageable))
+                .build());
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<ApiResponse<Void>> softDelete(@PathVariable UUID id) {
+        patientService.softDeletePatient(id);
+        return ResponseEntity.ok(ApiResponse.<Void>builder()
+                .code(ConstantUtil.OK_CODE)
+                .message(ConstantUtil.OK_MESSAGE)
                 .build());
     }
 }
