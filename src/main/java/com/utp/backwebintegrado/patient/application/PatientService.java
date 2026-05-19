@@ -63,6 +63,43 @@ public class PatientService {
         return patientMapper.toResponse(saved);
     }
 
+    // Metodo para editar paciente
+    @Transactional(rollbackFor = Exception.class)
+    public PatientResponse updatePatient(UUID id, PatientRequest request) {
+        Patient patient = patientRepository.findById(id)
+                .orElseThrow(() -> new ApiValidateException("Paciente no encontrado con ID: " + id));
+
+        if (!patient.getDocumentNumber().equals(request.getDocumentNumber()) &&
+                patientRepository.existsByDocumentNumber(request.getDocumentNumber())) {
+            throw new ApiValidateException("El documento ya está registrado.");
+        }
+
+        patient.setFirstName(request.getFirstName());
+        patient.setLastName(request.getLastName());
+        patient.setDocumentNumber(request.getDocumentNumber());
+        patient.setPhone(request.getPhone());
+        patient.setBirthDate(request.getBirthDate());
+        patient.setGender(request.getGender());
+        patient.setAddress(request.getAddress());
+
+        Patient updated = patientRepository.save(patient);
+        return patientMapper.toResponse(updated);
+    }
+
+    // Metodo para desactivar/activar paciente
+    @Transactional(rollbackFor = Exception.class)
+    public void changePatientStatus(UUID id, String newStatus) {
+        Patient patient = patientRepository.findById(id)
+                .orElseThrow(() -> new ApiValidateException("Paciente no encontrado con ID: " + id));
+
+        if (!newStatus.equals("ACTIVE") && !newStatus.equals("INACTIVE")) {
+            throw new ApiValidateException("Status debe ser ACTIVE o INACTIVE");
+        }
+
+        patient.getUser().setStatus(newStatus);
+        userRepository.save(patient.getUser());
+    }
+
     public List<PatientResponse> findAll() {
         return patientRepository.findAll().stream()
                 .map(patientMapper::toResponse) // De Dominio/Entity a DTO
