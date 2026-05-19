@@ -37,4 +37,11 @@ public interface DoctorScheduleSlotJpaRepository extends JpaRepository<DoctorSch
             @Param("doctorId") UUID doctorId,
             @Param("startDate") LocalDate startDate
     );
+
+    boolean existsByDoctorIdAndSlotDate(UUID doctorId, LocalDate slotDate);
+
+    List<DoctorScheduleSlot> findByDoctorIdAndSlotDate(UUID doctorId, LocalDate slotDate);
+
+    List<DoctorScheduleSlot> findByDoctorIdAndSlotDateGreaterThanEqual(UUID doctorId, LocalDate slotDate);
 }
+

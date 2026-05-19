@@ -1,11 +1,11 @@
-package com.utp.backwebintegrado.appointment.application.dto;
+package com.utp.backwebintegrado.doctor.application.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.UUID;
 
@@ -13,16 +13,17 @@ import java.util.UUID;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class DoctorScheduleSlotResponse {
+public class DoctorScheduleResponse {
     private UUID id;
     private UUID doctorId;
-    private String doctorName;
+    private String dayOfWeek;
+    private LocalTime startTime;
+    private LocalTime endTime;
     private UUID consultingRoomId;
     private String consultingRoomNumber;
     private String branchName;
-    private String branchAddress;
-    private LocalDate slotDate;
-    private LocalTime startTime;
-    private LocalTime endTime;
-    private String status;
+    private int slotDurationMinutes;
+
+    @JsonProperty("isActive")
+    private boolean isActive;
 }

@@ -45,4 +45,30 @@ public class DoctorScheduleSlotRepositoryImpl implements DoctorScheduleSlotRepos
     public void deleteById(UUID id) {
         jpaRepository.deleteById(id);
     }
+
+    @Override
+    public void delete(DoctorScheduleSlot slot) {
+        jpaRepository.delete(slot);
+    }
+
+    @Override
+    public void deleteAll(List<DoctorScheduleSlot> slots) {
+        jpaRepository.deleteAll(slots);
+    }
+
+    @Override
+    public boolean existsByDoctorIdAndSlotDate(UUID doctorId, LocalDate slotDate) {
+        return jpaRepository.existsByDoctorIdAndSlotDate(doctorId, slotDate);
+    }
+
+    @Override
+    public List<DoctorScheduleSlot> findByDoctorIdAndSlotDate(UUID doctorId, LocalDate slotDate) {
+        return jpaRepository.findByDoctorIdAndSlotDate(doctorId, slotDate);
+    }
+
+    @Override
+    public List<DoctorScheduleSlot> findByDoctorIdAndSlotDateGreaterThanEqual(UUID doctorId, LocalDate slotDate) {
+        return jpaRepository.findByDoctorIdAndSlotDateGreaterThanEqual(doctorId, slotDate);
+    }
 }
+
