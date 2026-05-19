@@ -2,6 +2,7 @@ package com.utp.backwebintegrado.clinical.domain;
 
 import com.github.f4b6a3.uuid.UuidCreator;
 import com.utp.backwebintegrado.appointment.domain.Appointment;
+import com.utp.backwebintegrado.shared.enumeration.ConsultationStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -27,6 +28,14 @@ public class Consultation {
     @Column(columnDefinition = "TEXT")
     private String notes;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status")
+    private ConsultationStatus status;
+
+    public ConsultationStatus getStatus() {
+        return this.status != null ? this.status : ConsultationStatus.PENDING;
+    }
+
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
@@ -37,6 +46,9 @@ public class Consultation {
         }
         if (this.createdAt == null) {
             this.createdAt = LocalDateTime.now();
+        }
+        if (this.status == null) {
+            this.status = ConsultationStatus.PENDING;
         }
     }
 }

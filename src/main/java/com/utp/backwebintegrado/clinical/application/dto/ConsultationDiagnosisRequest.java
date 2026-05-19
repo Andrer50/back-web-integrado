@@ -1,14 +1,10 @@
 package com.utp.backwebintegrado.clinical.application.dto;
 
-import lombok.Builder;
 import lombok.Data;
 
-import java.util.UUID;
-
 @Data
-@Builder
-public class DiagnosisResponse {
-    private UUID id;
+public class ConsultationDiagnosisRequest {
     private String icd10;
     private String description;
+    private String type; // PRINCIPAL, SECUNDARIO
 }

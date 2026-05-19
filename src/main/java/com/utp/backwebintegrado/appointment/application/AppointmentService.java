@@ -11,6 +11,9 @@ import com.utp.backwebintegrado.doctor.domain.DoctorRepository;
 import com.utp.backwebintegrado.patient.domain.Patient;
 import com.utp.backwebintegrado.patient.domain.PatientRepository;
 import com.utp.backwebintegrado.shared.enumeration.AppointmentStatus;
+import com.utp.backwebintegrado.shared.enumeration.ConsultationStatus;
+import com.utp.backwebintegrado.clinical.domain.Consultation;
+import com.utp.backwebintegrado.clinical.domain.ConsultationRepository;
 import com.utp.backwebintegrado.shared.exception.ApiValidateException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -28,6 +31,7 @@ public class AppointmentService {
     private final PatientRepository patientRepository;
     private final DoctorRepository doctorRepository;
     private final AppointmentMapper appointmentMapper;
+    private final ConsultationRepository consultationRepository;
 
     @Transactional(rollbackFor = Exception.class)
     public AppointmentResponse createAppointment(AppointmentRequest request) {
@@ -48,6 +52,15 @@ public class AppointmentService {
                 .build();
 
         Appointment saved = appointmentRepository.save(appointment);
+
+        // Generar automáticamente la consulta médica asociada en estado PENDING
+        Consultation consultation = Consultation.builder()
+                .appointment(saved)
+                .notes("")
+                .status(ConsultationStatus.PENDING)
+                .build();
+        consultationRepository.save(consultation);
+
         return appointmentMapper.toResponse(saved);
     }
 

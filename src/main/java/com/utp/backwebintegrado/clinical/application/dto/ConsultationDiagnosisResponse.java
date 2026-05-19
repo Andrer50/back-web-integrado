@@ -7,8 +7,9 @@ import java.util.UUID;
 
 @Data
 @Builder
-public class DiagnosisResponse {
+public class ConsultationDiagnosisResponse {
     private UUID id;
     private String icd10;
     private String description;
+    private String type;
 }
