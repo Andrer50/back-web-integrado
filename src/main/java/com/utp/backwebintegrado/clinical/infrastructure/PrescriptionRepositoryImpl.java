@@ -1,4 +1,37 @@
 package com.utp.backwebintegrado.clinical.infrastructure;
 
-public class PrescriptionRepositoryImpl {
+import com.utp.backwebintegrado.clinical.domain.Prescription;
+import com.utp.backwebintegrado.clinical.domain.PrescriptionRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+
+@Repository
+@RequiredArgsConstructor
+public class PrescriptionRepositoryImpl implements PrescriptionRepository {
+
+    private final PrescriptionJpaRepository jpaRepository;
+
+    @Override
+    public Prescription save(Prescription prescription) {
+        return jpaRepository.save(prescription);
+    }
+
+    @Override
+    public Optional<Prescription> findById(UUID id) {
+        return jpaRepository.findById(id);
+    }
+
+    @Override
+    public Optional<Prescription> findByConsultationId(UUID consultationId) {
+        return jpaRepository.findByConsultation_Id(consultationId);
+    }
+
+    @Override
+    public List<Prescription> findAll() {
+        return jpaRepository.findAll();
+    }
 }
