@@ -34,4 +34,9 @@ public class PrescriptionRepositoryImpl implements PrescriptionRepository {
     public List<Prescription> findAll() {
         return jpaRepository.findAll();
     }
+
+    @Override
+    public List<Prescription> findByPatientId(UUID patientId) {
+        return jpaRepository.findByConsultation_Appointment_Patient_IdOrderByIssueDateDesc(patientId);
+    }
 }

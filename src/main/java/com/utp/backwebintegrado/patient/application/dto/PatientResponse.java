@@ -23,4 +23,5 @@ public class PatientResponse {
     private String lastName;
     private String gender;
     private String address;
+    private String medicalHistory;
 }

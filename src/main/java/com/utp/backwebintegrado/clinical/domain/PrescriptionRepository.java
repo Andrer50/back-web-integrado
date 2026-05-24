@@ -9,4 +9,5 @@ public interface PrescriptionRepository {
     Optional<Prescription> findById(UUID id);
     Optional<Prescription> findByConsultationId(UUID consultationId);
     List<Prescription> findAll();
+    List<Prescription> findByPatientId(UUID patientId);
 }
