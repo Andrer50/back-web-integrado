@@ -1,5 +1,5 @@
 server:
-  port: ${PORT:8082}
+  port: 8082
 spring:
   datasource:
     url: jdbc:postgresql://dpg-d811r0u7r5hc73c3h6ig-a.oregon-postgres.render.com:5432/buss_cdlh
