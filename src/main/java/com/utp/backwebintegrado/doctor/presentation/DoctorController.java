@@ -52,4 +52,26 @@ public class DoctorController {
                 .data(doctorService.findById(id))
                 .build());
     }
+
+    @PatchMapping("/{id}/status")
+    public ResponseEntity<ApiResponse<Void>> changeStatus(
+            @PathVariable UUID id,
+            @RequestParam String status) {
+        doctorService.changeDoctorStatus(id, status);
+        return ResponseEntity.ok(ApiResponse.<Void>builder()
+                .code(ConstantUtil.OK_CODE)
+                .message(ConstantUtil.OK_MESSAGE)
+                .build());
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<ApiResponse<DoctorResponse>> update(
+            @PathVariable UUID id,
+            @RequestBody DoctorRequest request) {
+        return ResponseEntity.ok(ApiResponse.<DoctorResponse>builder()
+                .code(ConstantUtil.OK_CODE)
+                .message(ConstantUtil.OK_MESSAGE)
+                .data(doctorService.updateDoctor(id, request))
+                .build());
+    }
 }

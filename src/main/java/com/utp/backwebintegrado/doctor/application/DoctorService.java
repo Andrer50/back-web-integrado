@@ -79,4 +79,41 @@ public class DoctorService {
                 .map(doctorMapper::toResponse)
                 .orElseThrow(() -> new ApiValidateException("Médico no encontrado con ID: " + id));
     }
+
+    @Transactional(rollbackFor = Exception.class)
+    public void changeDoctorStatus(UUID id, String newStatus) {
+        Doctor doctor = doctorRepository.findById(id)
+                .orElseThrow(() -> new ApiValidateException("Médico no encontrado con ID: " + id));
+
+        if (!newStatus.equals("ACTIVE") && !newStatus.equals("INACTIVE")) {
+            throw new ApiValidateException("Status debe ser ACTIVE o INACTIVE");
+        }
+
+        doctor.getUser().setStatus(newStatus);
+        userRepository.save(doctor.getUser());
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public DoctorResponse updateDoctor(UUID id, DoctorRequest request) {
+        Doctor doctor = doctorRepository.findById(id)
+                .orElseThrow(() -> new ApiValidateException("Médico no encontrado con ID: " + id));
+
+        if (!doctor.getMedicalLicenseNumber().equals(request.getMedicalLicenseNumber()) &&
+                doctorRepository.existsByMedicalLicenseNumber(request.getMedicalLicenseNumber())) {
+            throw new ApiValidateException("El número de colegiatura ya está registrado.");
+        }
+
+        Set<Specialty> specialties = new HashSet<>();
+        if (request.getSpecialtyIds() != null) {
+            for (UUID specialtyId : request.getSpecialtyIds()) {
+                specialties.add(specialtyRepository.findById(specialtyId)
+                        .orElseThrow(() -> new ApiValidateException("Especialidad no encontrada: " + specialtyId)));
+            }
+        }
+
+        doctorMapper.updateEntityFromRequest(request, specialties, doctor);
+
+        Doctor updated = doctorRepository.save(doctor);
+        return doctorMapper.toResponse(updated);
+    }
 }
