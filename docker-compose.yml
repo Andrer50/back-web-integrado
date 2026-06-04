@@ -7,6 +7,8 @@ services:
     build:
       context: .
       dockerfile: deploy/Dockerfile
+      args:
+        SPRING_PROFILE: ${SPRING_PROFILE:-prod}
     deploy:
       resources:
         limits:
@@ -16,6 +18,7 @@ services:
           memory: ${MEM_RESERVATION:-1g}
     environment:
       SERVER_PORT: 8080
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILE:-prod}
       JAVA_TOOL_OPTIONS: >-
         -XX:InitialRAMPercentage=${INITIAL_RAM_PERCENTAGE:-20}
         -XX:MaxRAMPercentage=${MAX_RAM_PERCENTAGE:-80}

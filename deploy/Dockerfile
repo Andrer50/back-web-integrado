@@ -17,7 +17,9 @@ RUN addgroup -S appgroup && adduser -S appuser -G appgroup
 COPY --from=builder /workspace/target/*.jar app.jar
 
 
-ENV APP_NAME=${APP_NAME:-app}
+ARG SPRING_PROFILE=prod
+ENV SPRING_PROFILES_ACTIVE=${SPRING_PROFILE}
+ENV SERVER_PORT=${APP_PORT:-8080}
 EXPOSE 8080
 USER appuser
 
