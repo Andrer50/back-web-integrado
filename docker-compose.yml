@@ -14,9 +14,6 @@ services:
           memory: ${MEM_LIMIT:-2g}
         reservations:
           memory: ${MEM_RESERVATION:-1g}
-    volumes:
-      - /opt/cadisa/certs:/app/certs:ro
-
     environment:
       SERVER_PORT: 8080
       JAVA_TOOL_OPTIONS: >-

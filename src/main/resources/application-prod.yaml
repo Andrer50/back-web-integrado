@@ -1,10 +1,10 @@
 server:
-  port: 8082
+  port: 8080
 spring:
   datasource:
-    url: jdbc:postgresql://dpg-d811r0u7r5hc73c3h6ig-a.oregon-postgres.render.com:5432/buss_cdlh
-    username: mediconnect_user
-    password: Qgak155683CuJItyT54nXIC7wG0hBFnO
+    url: jdbc:postgresql://44.212.161.13:5432/mediconnect_db
+    username: postgres
+    password: wBtChxKHNsK6xvTsJeQSdKSLae8agNAiO
   jpa:
     hibernate:
       ddl-auto: update   # create, create-drop, update, validate, none
@@ -17,11 +17,11 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          jwk-set-uri: http://localhost:8081/.well-known/jwks.json
-    uri: http://localhost:8081
+          jwk-set-uri: http://44.212.161.13:8081/.well-known/jwks.json
+    uri: http://44.212.161.13:8081
 
-  uri-front: "http://localhost:3000"
+  uri-front: "http://44.212.161.13:3000"
 
 api:
   auth:
-    uri: "http://localhost:8081"
+    uri: "http://44.212.161.13:8081"
