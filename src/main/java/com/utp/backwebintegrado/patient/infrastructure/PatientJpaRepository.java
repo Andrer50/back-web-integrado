@@ -7,13 +7,16 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.Optional;
 import java.util.UUID;
 
 public interface PatientJpaRepository extends JpaRepository<Patient, UUID> {
     boolean existsByDocumentNumber(String documentNumber);
     boolean existsByUserId(UUID userId);
+    Optional<Patient> findByUserId(UUID userId);
 
     @Query("SELECT p FROM Patient p JOIN p.user u WHERE " +
+           "u.role = 'PATIENT' AND " +
            "(:userId IS NULL OR u.id = :userId) AND " +
            "(:query IS NULL OR LOWER(p.firstName) LIKE LOWER(CONCAT('%', CAST(:query AS string), '%')) OR " +
            "LOWER(p.lastName) LIKE LOWER(CONCAT('%', CAST(:query AS string), '%')) OR " +

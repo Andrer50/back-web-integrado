@@ -136,6 +136,12 @@ public class PatientService {
                 .orElseThrow(() -> new ApiValidateException("Paciente no encontrado con ID: " + id));
     }
 
+    public PatientResponse findByUserId(UUID userId) {
+        return patientRepository.findByUserId(userId)
+                .map(patientMapper::toResponse)
+                .orElseThrow(() -> new ApiValidateException("Paciente no encontrado para el usuario ID: " + userId));
+    }
+
     @Transactional(readOnly = true)
     public PatientMedicalHistoryResponse getMedicalHistory(UUID id) {
         Patient patient = patientRepository.findById(id)
