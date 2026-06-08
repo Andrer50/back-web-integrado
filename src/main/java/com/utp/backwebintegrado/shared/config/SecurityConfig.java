@@ -28,6 +28,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/patients/**").permitAll()
                         .requestMatchers("/api/v1/doctors/**").permitAll()
                         .requestMatchers("/api/v1/specialties/**").permitAll()
+                        .requestMatchers("/api/v1/branches/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()));

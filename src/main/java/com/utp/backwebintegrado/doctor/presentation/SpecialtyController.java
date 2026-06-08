@@ -14,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -21,6 +22,15 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class SpecialtyController {
     private final SpecialtyService specialtyService;
+
+    @GetMapping("/list")
+    public ResponseEntity<ApiResponse<List<SpecialtyResponse>>> findAllList() {
+        return ResponseEntity.ok(ApiResponse.<List<SpecialtyResponse>>builder()
+                .code(ConstantUtil.OK_CODE)
+                .message(ConstantUtil.OK_MESSAGE)
+                .data(specialtyService.findAll())
+                .build());
+    }
 
     @PostMapping
     public ResponseEntity<ApiResponse<SpecialtyResponse>> create(@RequestBody SpecialtyRequest request) {
