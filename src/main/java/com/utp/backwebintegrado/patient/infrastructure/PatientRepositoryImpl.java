@@ -54,6 +54,11 @@ public class PatientRepositoryImpl implements PatientRepository {
     }
 
     @Override
+    public Optional<Patient> findByUserEmail(String email) {
+        return jpaRepository.findByUserEmail(email);
+    }
+
+    @Override
     public void deleteById(UUID id) {
         jpaRepository.deleteById(id);
     }
