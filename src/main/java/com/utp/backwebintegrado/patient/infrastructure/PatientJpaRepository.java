@@ -14,6 +14,7 @@ public interface PatientJpaRepository extends JpaRepository<Patient, UUID> {
     boolean existsByDocumentNumber(String documentNumber);
     boolean existsByUserId(UUID userId);
     Optional<Patient> findByUserId(UUID userId);
+    Optional<Patient> findByUserEmail(String email);
 
     @Query("SELECT p FROM Patient p JOIN p.user u WHERE " +
            "u.role = 'PATIENT' AND " +
