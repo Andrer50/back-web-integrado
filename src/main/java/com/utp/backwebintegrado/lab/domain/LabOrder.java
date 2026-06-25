@@ -38,6 +38,9 @@ public class LabOrder {
     @Column(name = "ordered_at", nullable = false)
     private LocalDateTime orderedAt;
 
+    @OneToOne(mappedBy = "labOrder", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private LabResult labResult;
+
     @PrePersist
     public void generateId() {
         if (this.id == null) {

@@ -53,6 +53,17 @@ public class DoctorController {
                 .build());
     }
 
+    @PatchMapping("/{id}/status")
+    public ResponseEntity<ApiResponse<Void>> changeStatus(
+            @PathVariable UUID id,
+            @RequestParam String status) {
+        doctorService.changeDoctorStatus(id, status);
+        return ResponseEntity.ok(ApiResponse.<Void>builder()
+                .code(ConstantUtil.OK_CODE)
+                .message(ConstantUtil.OK_MESSAGE)
+                .build());
+    }
+
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse<DoctorResponse>> update(
             @PathVariable UUID id,
@@ -61,17 +72,6 @@ public class DoctorController {
                 .code(ConstantUtil.OK_CODE)
                 .message(ConstantUtil.OK_MESSAGE)
                 .data(doctorService.updateDoctor(id, request))
-                .build());
-    }
-
-    @PatchMapping("/{id}/status")
-    public ResponseEntity<ApiResponse<Void>> changeStatus(
-            @PathVariable UUID id,
-            @RequestParam String status) {
-        doctorService.changeStatusDoctor(id, status);
-        return ResponseEntity.ok(ApiResponse.<Void>builder()
-                .code(ConstantUtil.OK_CODE)
-                .message(ConstantUtil.OK_MESSAGE)
                 .build());
     }
 }

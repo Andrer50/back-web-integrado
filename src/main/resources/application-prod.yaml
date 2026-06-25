@@ -1,5 +1,5 @@
 server:
-  port: ${PORT:8082}
+  port: 8080
 spring:
   datasource:
     url: jdbc:postgresql://44.212.161.13:5432/mediconnect_db
@@ -17,11 +17,11 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          jwk-set-uri: http://localhost:8081/.well-known/jwks.json
-    uri: http://localhost:8081
+          jwk-set-uri: http://44.212.161.13:8081/.well-known/jwks.json
+    uri: http://44.212.161.13:8081
 
-  uri-front: "http://localhost:3000"
+  uri-front: "http://44.212.161.13:3000"
 
 api:
   auth:
-    uri: "http://localhost:8081"
+    uri: "http://44.212.161.13:8081"

@@ -11,4 +11,5 @@ public interface DoctorRepository {
     Optional<Doctor> findById(UUID id);
     Page<Doctor> findAll(String query, Pageable pageable);
     boolean existsByMedicalLicenseNumber(String medicalLicenseNumber);
+    Optional<Doctor> findByUserEmail(String email);
 }

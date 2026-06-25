@@ -4,6 +4,7 @@ import com.utp.backwebintegrado.patient.application.PatientService;
 import com.utp.backwebintegrado.patient.application.dto.PatientRequest;
 import com.utp.backwebintegrado.shared.dto.ApiResponse;
 import com.utp.backwebintegrado.patient.application.dto.PatientResponse;
+import com.utp.backwebintegrado.patient.application.dto.PatientMedicalHistoryResponse;
 import com.utp.backwebintegrado.shared.utility.ConstantUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -74,6 +75,24 @@ public class PatientController {
         return ResponseEntity.ok(ApiResponse.<Void>builder()
                 .code(ConstantUtil.OK_CODE)
                 .message(ConstantUtil.OK_MESSAGE)
+                .build());
+    }
+
+    @GetMapping("/{id}/medical-history")
+    public ResponseEntity<ApiResponse<PatientMedicalHistoryResponse>> getMedicalHistory(@PathVariable UUID id) {
+        return ResponseEntity.ok(ApiResponse.<PatientMedicalHistoryResponse>builder()
+                .code(ConstantUtil.OK_CODE)
+                .message(ConstantUtil.OK_MESSAGE)
+                .data(patientService.getMedicalHistory(id))
+                .build());
+    }
+
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<ApiResponse<PatientResponse>> findByUserId(@PathVariable UUID userId) {
+        return ResponseEntity.ok(ApiResponse.<PatientResponse>builder()
+                .code(ConstantUtil.OK_CODE)
+                .message(ConstantUtil.OK_MESSAGE)
+                .data(patientService.findByUserId(userId))
                 .build());
     }
 }

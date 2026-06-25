@@ -35,4 +35,9 @@ public class DoctorRepositoryImpl implements DoctorRepository {
     public boolean existsByMedicalLicenseNumber(String medicalLicenseNumber) {
         return jpaRepository.existsByMedicalLicenseNumber(medicalLicenseNumber);
     }
+
+    @Override
+    public Optional<Doctor> findByUserEmail(String email) {
+        return jpaRepository.findByUserEmail(email);
+    }
 }

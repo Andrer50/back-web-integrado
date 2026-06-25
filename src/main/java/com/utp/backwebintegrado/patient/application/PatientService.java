@@ -6,6 +6,18 @@ import com.utp.backwebintegrado.patient.domain.PatientRepository;
 import com.utp.backwebintegrado.patient.infrastructure.mapper.PatientMapper;
 import com.utp.backwebintegrado.patient.application.dto.PatientRequest;
 import com.utp.backwebintegrado.patient.application.dto.PatientResponse;
+import com.utp.backwebintegrado.patient.application.dto.PatientMedicalHistoryResponse;
+import com.utp.backwebintegrado.patient.application.dto.AllergyResponse;
+import com.utp.backwebintegrado.clinical.application.dto.PrescriptionResponse;
+import com.utp.backwebintegrado.lab.application.dto.LabOrderResponse;
+import com.utp.backwebintegrado.patient.domain.AllergyRepository;
+import com.utp.backwebintegrado.clinical.domain.PrescriptionRepository;
+import com.utp.backwebintegrado.clinical.domain.Prescription;
+import com.utp.backwebintegrado.lab.domain.LabOrderRepository;
+import com.utp.backwebintegrado.lab.domain.LabOrder;
+import com.utp.backwebintegrado.patient.infrastructure.mapper.AllergyMapper;
+import com.utp.backwebintegrado.clinical.infrastructure.mapper.PrescriptionMapper;
+import com.utp.backwebintegrado.lab.infrastructure.LabMapper;
 import com.utp.backwebintegrado.shared.client.AuthClient;
 import com.utp.backwebintegrado.shared.enumeration.Role;
 import com.utp.backwebintegrado.shared.exception.ApiValidateException;
@@ -31,6 +43,12 @@ public class PatientService {
     private final AuthClient authClient;
     private final PatientMapper patientMapper;
     private final UserMapper userMapper;
+    private final AllergyRepository allergyRepository;
+    private final PrescriptionRepository prescriptionRepository;
+    private final LabOrderRepository labOrderRepository;
+    private final AllergyMapper allergyMapper;
+    private final PrescriptionMapper prescriptionMapper;
+    private final LabMapper labMapper;
 
     @Transactional(rollbackFor = Exception.class)
     public PatientResponse createPatient(PatientRequest request) {
@@ -116,5 +134,38 @@ public class PatientService {
         return patientRepository.findById(id)
                 .map(patientMapper::toResponse) // De Dominio/Entity a DTO
                 .orElseThrow(() -> new ApiValidateException("Paciente no encontrado con ID: " + id));
+    }
+
+    public PatientResponse findByUserId(UUID userId) {
+        return patientRepository.findByUserId(userId)
+                .map(patientMapper::toResponse)
+                .orElseThrow(() -> new ApiValidateException("Paciente no encontrado para el usuario ID: " + userId));
+    }
+
+    @Transactional(readOnly = true)
+    public PatientMedicalHistoryResponse getMedicalHistory(UUID id) {
+        Patient patient = patientRepository.findById(id)
+                .orElseThrow(() -> new ApiValidateException("Paciente no encontrado con ID: " + id));
+
+        PatientResponse patientResponse = patientMapper.toResponse(patient);
+
+        List<AllergyResponse> allergies = allergyRepository.findByPatientId(id).stream()
+                .map(allergyMapper::toResponse)
+                .toList();
+
+        List<PrescriptionResponse> prescriptions = prescriptionRepository.findByPatientId(id).stream()
+                .map(prescriptionMapper::toResponse)
+                .toList();
+
+        List<LabOrderResponse> labOrders = labOrderRepository.findByPatientId(id).stream()
+                .map(labMapper::toResponse)
+                .toList();
+
+        return PatientMedicalHistoryResponse.builder()
+                .patient(patientResponse)
+                .allergies(allergies)
+                .prescriptions(prescriptions)
+                .labOrders(labOrders)
+                .build();
     }
 }

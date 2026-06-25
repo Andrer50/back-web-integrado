@@ -5,8 +5,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.UUID;
 
 @Data
@@ -14,9 +12,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AppointmentRequest {
-    private UUID patientId;
-    private UUID doctorId;
-    private LocalDate appointmentDate;
-    private LocalTime appointmentTime;
+    private UUID slotId;
     private String reason;
+    private UUID patientId; // Solo se usa cuando el creador es ADMIN
 }

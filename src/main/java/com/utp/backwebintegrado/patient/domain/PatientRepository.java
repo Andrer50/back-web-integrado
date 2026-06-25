@@ -14,6 +14,8 @@ public interface PatientRepository {
     Page<Patient> findAll(UUID userId, String query, String status, Pageable pageable);
     boolean existsByDocumentNumber(String documentNumber);
     boolean existsByUserId(UUID userId);
+    Optional<Patient> findByUserId(UUID userId);
+    Optional<Patient> findByUserEmail(String email);
     void deleteById(UUID id);
 
 }

@@ -24,6 +24,11 @@ public interface DoctorMapper {
     @Mapping(target = "phone", source = "request.phone")
     Doctor toEntity(DoctorRequest request, User user, Set<Specialty> specialties);
 
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "user", ignore = true)
+    @Mapping(target = "specialties", source = "specialties")
+    void updateEntityFromRequest(DoctorRequest request, Set<Specialty> specialties, @org.mapstruct.MappingTarget Doctor doctor);
+
     @Mapping(target = "user", source = "doctor")
     DoctorResponse toResponse(Doctor doctor);
 
