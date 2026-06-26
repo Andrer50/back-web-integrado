@@ -7,5 +7,6 @@ import java.util.List;
 import java.util.UUID;
 
 public interface LabOrderJpaRepository extends JpaRepository<LabOrder, UUID> {
+    List<LabOrder> findByConsultation_IdOrderByOrderedAtDesc(UUID consultationId);
     List<LabOrder> findByConsultation_Appointment_Patient_IdOrderByOrderedAtDesc(UUID patientId);
 }

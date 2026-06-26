@@ -26,6 +26,11 @@ public class LabOrderRepositoryImpl implements LabOrderRepository {
     }
 
     @Override
+    public List<LabOrder> findByConsultationId(UUID consultationId) {
+        return jpaRepository.findByConsultation_IdOrderByOrderedAtDesc(consultationId);
+    }
+
+    @Override
     public List<LabOrder> findByPatientId(UUID patientId) {
         return jpaRepository.findByConsultation_Appointment_Patient_IdOrderByOrderedAtDesc(patientId);
     }
