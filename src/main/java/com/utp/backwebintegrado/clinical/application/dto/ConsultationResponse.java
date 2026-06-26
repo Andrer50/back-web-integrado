@@ -1,5 +1,6 @@
 package com.utp.backwebintegrado.clinical.application.dto;
 
+import com.utp.backwebintegrado.lab.application.dto.LabOrderResponse;
 import lombok.Builder;
 import lombok.Data;
 
@@ -22,4 +23,5 @@ public class ConsultationResponse {
     private ConsultationVitalsResponse vitals;
     private List<ConsultationDiagnosisResponse> diagnoses;
     private PrescriptionResponse prescription;
+    private List<LabOrderResponse> labOrders;
 }

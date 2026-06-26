@@ -1,9 +1,9 @@
 package com.utp.backwebintegrado.clinical.application.dto;
 
+import com.utp.backwebintegrado.lab.application.dto.LabOrderRequest;
 import lombok.Data;
 
 import java.util.List;
-import java.util.UUID;
 
 /**
  * Request unificado para finalizar una consulta completa en un solo llamado.
@@ -15,6 +15,7 @@ public class CompleteConsultationRequest {
     private ConsultationVitalsRequest vitals;
     private ConsultationDiagnosisRequest diagnosis;
     private PrescriptionRequest prescription;
+    private List<LabOrderRequest> labOrders;
     private List<AllergyConsultationRequest> allergies;
 
     @Data

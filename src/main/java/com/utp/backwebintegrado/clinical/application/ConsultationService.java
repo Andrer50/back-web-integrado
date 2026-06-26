@@ -1,10 +1,16 @@
 package com.utp.backwebintegrado.clinical.application;
 
+import com.utp.backwebintegrado.audit.application.AuditService;
 import com.utp.backwebintegrado.appointment.domain.Appointment;
 import com.utp.backwebintegrado.appointment.domain.AppointmentRepository;
 import com.utp.backwebintegrado.clinical.application.dto.*;
 import com.utp.backwebintegrado.clinical.domain.*;
 import com.utp.backwebintegrado.clinical.infrastructure.mapper.ConsultationMapper;
+import com.utp.backwebintegrado.lab.application.dto.LabOrderRequest;
+import com.utp.backwebintegrado.lab.application.dto.LabOrderResponse;
+import com.utp.backwebintegrado.lab.domain.LabOrder;
+import com.utp.backwebintegrado.lab.domain.LabOrderRepository;
+import com.utp.backwebintegrado.lab.infrastructure.LabMapper;
 import com.utp.backwebintegrado.patient.domain.Allergy;
 import com.utp.backwebintegrado.patient.domain.AllergyRepository;
 import com.utp.backwebintegrado.patient.domain.Patient;
@@ -13,6 +19,7 @@ import com.utp.backwebintegrado.shared.enumeration.AllergySeverity;
 import com.utp.backwebintegrado.shared.enumeration.DiagnosisType;
 import com.utp.backwebintegrado.shared.enumeration.AppointmentStatus;
 import com.utp.backwebintegrado.shared.enumeration.ConsultationStatus;
+import com.utp.backwebintegrado.shared.enumeration.LabOrderStatus;
 import com.utp.backwebintegrado.shared.exception.ApiValidateException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -36,6 +43,9 @@ public class ConsultationService {
     private final PatientRepository patientRepository;
     private final DiagnosisRepository diagnosisEntityRepository;
     private final ConsultationMapper consultationMapper;
+    private final LabOrderRepository labOrderRepository;
+    private final LabMapper labMapper;
+    private final AuditService auditService;
 
     /**
      * Crea una nueva consulta vinculada a una cita médica.
@@ -134,7 +144,7 @@ public class ConsultationService {
      * Guarda notas, vitales, diagnóstico, receta médica y alergias.
      */
     @Transactional(rollbackFor = Exception.class)
-    public ConsultationResponse completeConsultation(UUID consultationId, CompleteConsultationRequest request) {
+    public ConsultationResponse completeConsultation(UUID consultationId, CompleteConsultationRequest request, String actorEmail, List<String> roles) {
         Consultation consultation = consultationRepository.findById(consultationId)
                 .orElseThrow(() -> new ApiValidateException("Consulta no encontrada: " + consultationId));
 
@@ -211,10 +221,14 @@ public class ConsultationService {
             }
             // Guarda la prescripción con sus ítems (cascade ALL)
             savedPrescription.setItems(items);
-            prescriptionRepository.save(savedPrescription);
+            savedPrescription = prescriptionRepository.save(savedPrescription);
+            auditService.recordPrescriptionCreated(savedPrescription, actorEmail, roles);
         }
 
-        // 5. Registrar alergias del paciente
+        // 5. Registrar solicitudes de laboratorio o imagenes
+        saveLabOrders(consultation, request.getLabOrders());
+
+        // 6. Registrar alergias del paciente
         if (request.getAllergies() != null && !request.getAllergies().isEmpty()) {
             Patient patient = consultation.getAppointment().getPatient();
             for (CompleteConsultationRequest.AllergyConsultationRequest allergyReq : request.getAllergies()) {
@@ -227,12 +241,16 @@ public class ConsultationService {
                         .build());
             }
         }
-        // 6. Actualizar el estado de la cita a COMPLETED
+        // 7. Actualizar el estado de la cita a COMPLETED
         Appointment appointment = consultation.getAppointment();
+        AppointmentStatus previousAppointmentStatus = appointment.getStatus();
         appointment.setStatus(AppointmentStatus.COMPLETED);
         appointmentRepository.save(appointment);
+        if (previousAppointmentStatus != AppointmentStatus.COMPLETED) {
+            auditService.recordAppointmentStatusChange(appointment, previousAppointmentStatus, AppointmentStatus.COMPLETED, actorEmail, roles);
+        }
 
-        // 7. Actualizar el estado de la consulta a COMPLETED
+        // 8. Actualizar el estado de la consulta a COMPLETED
         consultation.setStatus(ConsultationStatus.COMPLETED);
         consultationRepository.save(consultation);
 
@@ -258,9 +276,38 @@ public class ConsultationService {
         List<ConsultationVitals> vitalsList = vitalsRepository.findByConsultationId(c.getId());
         List<ConsultationDiagnosis> diagnosesList = diagnosisRepository.findByConsultationId(c.getId());
         Prescription prescription = prescriptionRepository.findByConsultationId(c.getId()).orElse(null);
+        List<LabOrderResponse> labOrders = labOrderRepository.findByConsultationId(c.getId()).stream()
+                .map(labMapper::toResponse)
+                .toList();
 
         ConsultationVitals vitals = vitalsList.isEmpty() ? null : vitalsList.get(0);
 
-        return consultationMapper.toFullResponse(c, vitals, diagnosesList, prescription);
+        ConsultationResponse response = consultationMapper.toFullResponse(c, vitals, diagnosesList, prescription);
+        response.setLabOrders(labOrders);
+        return response;
+    }
+
+    private void saveLabOrders(Consultation consultation, List<LabOrderRequest> labOrders) {
+        if (labOrders == null || labOrders.isEmpty()) {
+            return;
+        }
+
+        labOrders.stream()
+                .filter(this::hasLabOrderName)
+                .map(request -> LabOrder.builder()
+                        .consultation(consultation)
+                        .type(normalizeLabOrderType(request.getType()))
+                        .name(request.getName().trim())
+                        .status(LabOrderStatus.PENDING)
+                        .build())
+                .forEach(labOrderRepository::save);
+    }
+
+    private boolean hasLabOrderName(LabOrderRequest request) {
+        return request != null && request.getName() != null && !request.getName().isBlank();
+    }
+
+    private String normalizeLabOrderType(String type) {
+        return type != null && !type.isBlank() ? type.trim().toUpperCase() : "LABORATORY";
     }
 }
