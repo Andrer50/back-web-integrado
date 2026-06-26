@@ -81,19 +81,6 @@ public class DoctorService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public void changeDoctorStatus(UUID id, String newStatus) {
-        Doctor doctor = doctorRepository.findById(id)
-                .orElseThrow(() -> new ApiValidateException("Médico no encontrado con ID: " + id));
-
-        if (!newStatus.equals("ACTIVE") && !newStatus.equals("INACTIVE")) {
-            throw new ApiValidateException("Status debe ser ACTIVE o INACTIVE");
-        }
-
-        doctor.getUser().setStatus(newStatus);
-        userRepository.save(doctor.getUser());
-    }
-
-    @Transactional(rollbackFor = Exception.class)
     public DoctorResponse updateDoctor(UUID id, DoctorRequest request) {
         Doctor doctor = doctorRepository.findById(id)
                 .orElseThrow(() -> new ApiValidateException("Médico no encontrado con ID: " + id));
@@ -115,5 +102,18 @@ public class DoctorService {
 
         Doctor updated = doctorRepository.save(doctor);
         return doctorMapper.toResponse(updated);
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public void changeDoctorStatus(UUID id, String newStatus) {
+        Doctor doctor = doctorRepository.findById(id)
+                .orElseThrow(() -> new ApiValidateException("Médico no encontrado con ID: " + id));
+
+        if (!newStatus.equals("ACTIVE") && !newStatus.equals("INACTIVE")) {
+            throw new ApiValidateException("Status debe ser ACTIVE o INACTIVE");
+        }
+
+        doctor.getUser().setStatus(newStatus);
+        userRepository.save(doctor.getUser());
     }
 }
