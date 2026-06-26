@@ -8,6 +8,7 @@ import com.utp.backwebintegrado.appointment.domain.AppointmentRepository;
 import com.utp.backwebintegrado.appointment.domain.DoctorScheduleSlot;
 import com.utp.backwebintegrado.appointment.domain.DoctorScheduleSlotRepository;
 import com.utp.backwebintegrado.appointment.infrastructure.mapper.AppointmentMapper;
+import com.utp.backwebintegrado.audit.application.AuditService;
 import com.utp.backwebintegrado.doctor.domain.Doctor;
 import com.utp.backwebintegrado.doctor.domain.DoctorRepository;
 import com.utp.backwebintegrado.patient.domain.Patient;
@@ -37,6 +38,7 @@ public class AppointmentService {
     private final AppointmentMapper appointmentMapper;
     private final ConsultationRepository consultationRepository;
     private final DoctorScheduleSlotRepository slotRepository;
+    private final AuditService auditService;
 
 
     @Transactional(rollbackFor = Exception.class)
@@ -94,6 +96,7 @@ public class AppointmentService {
                 .status(ConsultationStatus.PENDING)
                 .build();
         consultationRepository.save(consultation);
+        auditService.recordAppointmentCreated(saved, userEmail, roles);
 
         return appointmentMapper.toResponse(saved);
     }
@@ -204,6 +207,8 @@ public class AppointmentService {
                 slotRepository.save(slot);
             }
         }
+
+        auditService.recordAppointmentStatusChange(appointment, current, target, userEmail, roles);
 
         return appointmentMapper.toResponse(appointment);
     }
