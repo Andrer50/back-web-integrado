@@ -3,6 +3,8 @@ package com.utp.backwebintegrado.lab.presentation;
 import com.utp.backwebintegrado.lab.application.LabOrderService;
 import com.utp.backwebintegrado.lab.application.dto.LabOrderRequest;
 import com.utp.backwebintegrado.lab.application.dto.LabOrderResponse;
+import com.utp.backwebintegrado.lab.application.dto.LabResultRequest;
+import com.utp.backwebintegrado.lab.application.dto.LabResultResponse;
 import com.utp.backwebintegrado.shared.dto.ApiResponse;
 import com.utp.backwebintegrado.shared.utility.ConstantUtil;
 import lombok.RequiredArgsConstructor;
@@ -51,6 +53,17 @@ public class LabController {
                 .code(ConstantUtil.OK_CODE)
                 .message(ConstantUtil.OK_MESSAGE)
                 .data(labOrderService.findById(id))
+                .build());
+    }
+
+    @PostMapping("/{id}/result")
+    public ResponseEntity<ApiResponse<LabResultResponse>> recordResult(
+            @PathVariable UUID id,
+            @RequestBody LabResultRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.<LabResultResponse>builder()
+                .code(ConstantUtil.OK_CODE)
+                .message(ConstantUtil.OK_MESSAGE)
+                .data(labOrderService.recordResult(id, request))
                 .build());
     }
 }

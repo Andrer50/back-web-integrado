@@ -14,6 +14,7 @@ public class CompleteConsultationRequest {
     private String notes;
     private ConsultationVitalsRequest vitals;
     private ConsultationDiagnosisRequest diagnosis;
+    private List<ConsultationDiagnosisRequest> diagnoses;
     private PrescriptionRequest prescription;
     private List<LabOrderRequest> labOrders;
     private List<AllergyConsultationRequest> allergies;
