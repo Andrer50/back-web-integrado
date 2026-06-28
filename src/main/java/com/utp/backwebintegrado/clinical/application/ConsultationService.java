@@ -138,7 +138,7 @@ public class ConsultationService {
             consultationRepository.save(consultation);
         }
 
-        // 2. Registrar signos vitales
+        // Registrar signos vitales
         if (request.getVitals() != null) {
             ConsultationVitalsRequest v = request.getVitals();
             vitalsRepository.save(ConsultationVitals.builder()
@@ -156,7 +156,7 @@ public class ConsultationService {
         validatePrimaryDiagnosisLimit(consultationId, diagnosisRequests);
         diagnosisRequests.forEach(diagnosis -> saveDiagnosis(consultation, diagnosis));
 
-        // 4. Crear receta médica con sus ítems
+        // Crear receta médica con sus ítems
         if (request.getPrescription() != null && request.getPrescription().getItems() != null
                 && !request.getPrescription().getItems().isEmpty()) {
 

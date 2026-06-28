@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -48,11 +49,31 @@ public class AppointmentController {
             @RequestParam(required = false) String status,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) String sort,
             @AuthenticationPrincipal Jwt jwt
     ) {
         String email = jwt.getSubject();
         List<String> roles = jwt.getClaimAsStringList("roles");
-        Pageable pageable = PageRequest.of(page, size);
+
+        Sort sortOrder = Sort.unsorted();
+        if (sort != null && !sort.trim().isEmpty()) {
+            String[] parts = sort.split(",");
+            if (parts.length > 0) {
+                String property = parts[0].trim();
+                Sort.Direction direction = (parts.length > 1 && parts[1].trim().equalsIgnoreCase("desc"))
+                        ? Sort.Direction.DESC
+                        : Sort.Direction.ASC;
+                sortOrder = Sort.by(direction, property);
+
+                if (property.equals("appointmentDate")) {
+                    sortOrder = sortOrder.and(Sort.by(direction, "appointmentTime"));
+                }
+            }
+        } else {
+            sortOrder = Sort.by(Sort.Direction.DESC, "createdAt");
+        }
+
+        Pageable pageable = PageRequest.of(page, size, sortOrder);
 
         return ResponseEntity.ok(ApiResponse.<Page<AppointmentResponse>>builder()
                 .code(ConstantUtil.OK_CODE)
