@@ -144,7 +144,7 @@ public class ConsultationService {
             consultationRepository.save(consultation);
         }
 
-        // 2. Registrar signos vitales
+        // Registrar signos vitales
         if (request.getVitals() != null) {
             ConsultationVitalsRequest v = request.getVitals();
             vitalsRepository.save(ConsultationVitals.builder()
@@ -157,7 +157,7 @@ public class ConsultationService {
                     .build());
         }
 
-        // 3. Registrar diagnóstico
+        // Registrar diagnóstico
         if (request.getDiagnosis() != null) {
             ConsultationDiagnosisRequest d = request.getDiagnosis();
             if (d.getIcd10() != null && !d.getIcd10().isBlank()) {
@@ -179,7 +179,7 @@ public class ConsultationService {
             }
         }
 
-        // 4. Crear receta médica con sus ítems
+        // Crear receta médica con sus ítems
         if (request.getPrescription() != null && request.getPrescription().getItems() != null
                 && !request.getPrescription().getItems().isEmpty()) {
 
@@ -214,7 +214,7 @@ public class ConsultationService {
             prescriptionRepository.save(savedPrescription);
         }
 
-        // 5. Registrar alergias del paciente
+        // Registrar alergias del paciente
         if (request.getAllergies() != null && !request.getAllergies().isEmpty()) {
             Patient patient = consultation.getAppointment().getPatient();
             for (CompleteConsultationRequest.AllergyConsultationRequest allergyReq : request.getAllergies()) {
@@ -227,12 +227,12 @@ public class ConsultationService {
                         .build());
             }
         }
-        // 6. Actualizar el estado de la cita a COMPLETED
+        // Actualizar el estado de la cita a COMPLETED
         Appointment appointment = consultation.getAppointment();
         appointment.setStatus(AppointmentStatus.COMPLETED);
         appointmentRepository.save(appointment);
 
-        // 7. Actualizar el estado de la consulta a COMPLETED
+        // Actualizar el estado de la consulta a COMPLETED
         consultation.setStatus(ConsultationStatus.COMPLETED);
         consultationRepository.save(consultation);
 

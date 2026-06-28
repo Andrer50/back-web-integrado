@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.UUID;
 
@@ -27,4 +28,5 @@ public class AppointmentResponse {
     private LocalTime appointmentTime;
     private String status;
     private String reason;
+    private LocalDateTime createdAt;
 }
