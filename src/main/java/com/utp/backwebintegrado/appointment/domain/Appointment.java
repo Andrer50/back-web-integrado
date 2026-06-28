@@ -10,6 +10,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.UUID;
 
@@ -48,11 +49,17 @@ public class Appointment {
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "slot_id", unique = true)
     private DoctorScheduleSlot scheduleSlot;
+
+    @Column(name = "created_at", updatable = false)
+    private LocalDateTime createdAt;
+
     @PrePersist
-    public void generateId() {
+    public void prePersist() {
         if (this.id == null) {
-            // getTimeOrderedEpoch() es el método exacto para UUID v7
             this.id = UuidCreator.getTimeOrderedEpoch();
+        }
+        if (this.createdAt == null) {
+            this.createdAt = LocalDateTime.now();
         }
     }
 }
