@@ -7,5 +7,6 @@ import java.util.UUID;
 public interface LabOrderRepository {
     LabOrder save(LabOrder labOrder);
     Optional<LabOrder> findById(UUID id);
+    List<LabOrder> findByConsultationId(UUID consultationId);
     List<LabOrder> findByPatientId(UUID patientId);
 }

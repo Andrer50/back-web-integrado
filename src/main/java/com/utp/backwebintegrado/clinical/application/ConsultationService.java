@@ -1,10 +1,16 @@
 package com.utp.backwebintegrado.clinical.application;
 
+import com.utp.backwebintegrado.audit.application.AuditService;
 import com.utp.backwebintegrado.appointment.domain.Appointment;
 import com.utp.backwebintegrado.appointment.domain.AppointmentRepository;
 import com.utp.backwebintegrado.clinical.application.dto.*;
 import com.utp.backwebintegrado.clinical.domain.*;
 import com.utp.backwebintegrado.clinical.infrastructure.mapper.ConsultationMapper;
+import com.utp.backwebintegrado.lab.application.dto.LabOrderRequest;
+import com.utp.backwebintegrado.lab.application.dto.LabOrderResponse;
+import com.utp.backwebintegrado.lab.domain.LabOrder;
+import com.utp.backwebintegrado.lab.domain.LabOrderRepository;
+import com.utp.backwebintegrado.lab.infrastructure.LabMapper;
 import com.utp.backwebintegrado.patient.domain.Allergy;
 import com.utp.backwebintegrado.patient.domain.AllergyRepository;
 import com.utp.backwebintegrado.patient.domain.Patient;
@@ -13,6 +19,7 @@ import com.utp.backwebintegrado.shared.enumeration.AllergySeverity;
 import com.utp.backwebintegrado.shared.enumeration.DiagnosisType;
 import com.utp.backwebintegrado.shared.enumeration.AppointmentStatus;
 import com.utp.backwebintegrado.shared.enumeration.ConsultationStatus;
+import com.utp.backwebintegrado.shared.enumeration.LabOrderStatus;
 import com.utp.backwebintegrado.shared.exception.ApiValidateException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -36,6 +43,9 @@ public class ConsultationService {
     private final PatientRepository patientRepository;
     private final DiagnosisRepository diagnosisEntityRepository;
     private final ConsultationMapper consultationMapper;
+    private final LabOrderRepository labOrderRepository;
+    private final LabMapper labMapper;
+    private final AuditService auditService;
 
     /**
      * Crea una nueva consulta vinculada a una cita médica.
@@ -108,24 +118,8 @@ public class ConsultationService {
         Consultation consultation = consultationRepository.findById(consultationId)
                 .orElseThrow(() -> new ApiValidateException("Consulta no encontrada: " + consultationId));
 
-        // Buscar o crear el diagnóstico CIE-10
-        Diagnosis diagnosisEntity = diagnosisEntityRepository.findByIcd10(request.getIcd10())
-                .orElseGet(() -> diagnosisEntityRepository.save(
-                        Diagnosis.builder()
-                                .icd10(request.getIcd10())
-                                .description(request.getDescription())
-                                .build()
-                ));
-
-        DiagnosisType type = DiagnosisType.valueOf(request.getType().toUpperCase());
-
-        ConsultationDiagnosis consultationDiagnosis = ConsultationDiagnosis.builder()
-                .consultation(consultation)
-                .diagnosis(diagnosisEntity)
-                .type(type)
-                .build();
-
-        ConsultationDiagnosis saved = diagnosisRepository.save(consultationDiagnosis);
+        validatePrimaryDiagnosisLimit(consultationId, List.of(request));
+        ConsultationDiagnosis saved = saveDiagnosis(consultation, request);
         return consultationMapper.toDiagnosisResponse(saved);
     }
 
@@ -134,7 +128,7 @@ public class ConsultationService {
      * Guarda notas, vitales, diagnóstico, receta médica y alergias.
      */
     @Transactional(rollbackFor = Exception.class)
-    public ConsultationResponse completeConsultation(UUID consultationId, CompleteConsultationRequest request) {
+    public ConsultationResponse completeConsultation(UUID consultationId, CompleteConsultationRequest request, String actorEmail, List<String> roles) {
         Consultation consultation = consultationRepository.findById(consultationId)
                 .orElseThrow(() -> new ApiValidateException("Consulta no encontrada: " + consultationId));
 
@@ -157,27 +151,10 @@ public class ConsultationService {
                     .build());
         }
 
-        // Registrar diagnóstico
-        if (request.getDiagnosis() != null) {
-            ConsultationDiagnosisRequest d = request.getDiagnosis();
-            if (d.getIcd10() != null && !d.getIcd10().isBlank()) {
-                Diagnosis diagnosisEntity = diagnosisEntityRepository.findByIcd10(d.getIcd10())
-                        .orElseGet(() -> diagnosisEntityRepository.save(
-                                Diagnosis.builder()
-                                        .icd10(d.getIcd10())
-                                        .description(d.getDescription())
-                                        .build()
-                        ));
-                DiagnosisType type = d.getType() != null
-                        ? DiagnosisType.valueOf(d.getType().toUpperCase())
-                        : DiagnosisType.PRIMARY;
-                diagnosisRepository.save(ConsultationDiagnosis.builder()
-                        .consultation(consultation)
-                        .diagnosis(diagnosisEntity)
-                        .type(type)
-                        .build());
-            }
-        }
+        // 3. Registrar diagnóstico principal y diagnósticos secundarios
+        List<ConsultationDiagnosisRequest> diagnosisRequests = getDiagnosisRequests(request);
+        validatePrimaryDiagnosisLimit(consultationId, diagnosisRequests);
+        diagnosisRequests.forEach(diagnosis -> saveDiagnosis(consultation, diagnosis));
 
         // Crear receta médica con sus ítems
         if (request.getPrescription() != null && request.getPrescription().getItems() != null
@@ -211,10 +188,14 @@ public class ConsultationService {
             }
             // Guarda la prescripción con sus ítems (cascade ALL)
             savedPrescription.setItems(items);
-            prescriptionRepository.save(savedPrescription);
+            savedPrescription = prescriptionRepository.save(savedPrescription);
+            auditService.recordPrescriptionCreated(savedPrescription, actorEmail, roles);
         }
 
-        // Registrar alergias del paciente
+        // 5. Registrar solicitudes de laboratorio o imagenes
+        saveLabOrders(consultation, request.getLabOrders());
+
+        // 6. Registrar alergias del paciente
         if (request.getAllergies() != null && !request.getAllergies().isEmpty()) {
             Patient patient = consultation.getAppointment().getPatient();
             for (CompleteConsultationRequest.AllergyConsultationRequest allergyReq : request.getAllergies()) {
@@ -227,12 +208,16 @@ public class ConsultationService {
                         .build());
             }
         }
-        // Actualizar el estado de la cita a COMPLETED
+        // 7. Actualizar el estado de la cita a COMPLETED
         Appointment appointment = consultation.getAppointment();
+        AppointmentStatus previousAppointmentStatus = appointment.getStatus();
         appointment.setStatus(AppointmentStatus.COMPLETED);
         appointmentRepository.save(appointment);
+        if (previousAppointmentStatus != AppointmentStatus.COMPLETED) {
+            auditService.recordAppointmentStatusChange(appointment, previousAppointmentStatus, AppointmentStatus.COMPLETED, actorEmail, roles);
+        }
 
-        // Actualizar el estado de la consulta a COMPLETED
+        // 8. Actualizar el estado de la consulta a COMPLETED
         consultation.setStatus(ConsultationStatus.COMPLETED);
         consultationRepository.save(consultation);
 
@@ -258,9 +243,97 @@ public class ConsultationService {
         List<ConsultationVitals> vitalsList = vitalsRepository.findByConsultationId(c.getId());
         List<ConsultationDiagnosis> diagnosesList = diagnosisRepository.findByConsultationId(c.getId());
         Prescription prescription = prescriptionRepository.findByConsultationId(c.getId()).orElse(null);
+        List<LabOrderResponse> labOrders = labOrderRepository.findByConsultationId(c.getId()).stream()
+                .map(labMapper::toResponse)
+                .toList();
 
         ConsultationVitals vitals = vitalsList.isEmpty() ? null : vitalsList.get(0);
 
-        return consultationMapper.toFullResponse(c, vitals, diagnosesList, prescription);
+        ConsultationResponse response = consultationMapper.toFullResponse(c, vitals, diagnosesList, prescription);
+        response.setLabOrders(labOrders);
+        return response;
+    }
+
+    private void saveLabOrders(Consultation consultation, List<LabOrderRequest> labOrders) {
+        if (labOrders == null || labOrders.isEmpty()) {
+            return;
+        }
+
+        labOrders.stream()
+                .filter(this::hasLabOrderName)
+                .map(request -> LabOrder.builder()
+                        .consultation(consultation)
+                        .type(normalizeLabOrderType(request.getType()))
+                        .name(request.getName().trim())
+                        .status(LabOrderStatus.PENDING)
+                        .build())
+                .forEach(labOrderRepository::save);
+    }
+
+    private boolean hasLabOrderName(LabOrderRequest request) {
+        return request != null && request.getName() != null && !request.getName().isBlank();
+    }
+
+    private String normalizeLabOrderType(String type) {
+        return type != null && !type.isBlank() ? type.trim().toUpperCase() : "LABORATORY";
+    }
+
+    private List<ConsultationDiagnosisRequest> getDiagnosisRequests(CompleteConsultationRequest request) {
+        if (request.getDiagnoses() != null && !request.getDiagnoses().isEmpty()) {
+            return request.getDiagnoses().stream()
+                    .filter(this::hasDiagnosisCode)
+                    .toList();
+        }
+
+        return hasDiagnosisCode(request.getDiagnosis())
+                ? List.of(request.getDiagnosis())
+                : List.of();
+    }
+
+    private boolean hasDiagnosisCode(ConsultationDiagnosisRequest request) {
+        return request != null && request.getIcd10() != null && !request.getIcd10().isBlank();
+    }
+
+    private void validatePrimaryDiagnosisLimit(UUID consultationId, List<ConsultationDiagnosisRequest> requests) {
+        long existingPrimaryCount = diagnosisRepository.findByConsultationId(consultationId).stream()
+                .filter(diagnosis -> diagnosis.getType() == DiagnosisType.PRIMARY)
+                .count();
+        long requestedPrimaryCount = requests.stream()
+                .filter(this::hasDiagnosisCode)
+                .map(request -> parseDiagnosisType(request.getType()))
+                .filter(type -> type == DiagnosisType.PRIMARY)
+                .count();
+
+        if (existingPrimaryCount + requestedPrimaryCount > 1) {
+            throw new ApiValidateException("La consulta solo puede tener un diagnóstico principal.");
+        }
+    }
+
+    private ConsultationDiagnosis saveDiagnosis(Consultation consultation, ConsultationDiagnosisRequest request) {
+        Diagnosis diagnosisEntity = diagnosisEntityRepository.findByIcd10(request.getIcd10().trim().toUpperCase())
+                .orElseGet(() -> diagnosisEntityRepository.save(
+                        Diagnosis.builder()
+                                .icd10(request.getIcd10().trim().toUpperCase())
+                                .description(request.getDescription())
+                                .build()
+                ));
+
+        return diagnosisRepository.save(ConsultationDiagnosis.builder()
+                .consultation(consultation)
+                .diagnosis(diagnosisEntity)
+                .type(parseDiagnosisType(request.getType()))
+                .build());
+    }
+
+    private DiagnosisType parseDiagnosisType(String type) {
+        if (type == null || type.isBlank()) {
+            return DiagnosisType.PRIMARY;
+        }
+
+        return switch (type.trim().toUpperCase()) {
+            case "PRIMARY", "PRINCIPAL" -> DiagnosisType.PRIMARY;
+            case "SECONDARY", "SECUNDARIO" -> DiagnosisType.SECONDARY;
+            default -> throw new ApiValidateException("Tipo de diagnóstico no válido: " + type);
+        };
     }
 }

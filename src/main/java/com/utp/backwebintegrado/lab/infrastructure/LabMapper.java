@@ -1,7 +1,9 @@
 package com.utp.backwebintegrado.lab.infrastructure;
 
 import com.utp.backwebintegrado.lab.application.dto.LabOrderResponse;
+import com.utp.backwebintegrado.lab.application.dto.LabResultResponse;
 import com.utp.backwebintegrado.lab.domain.LabOrder;
+import com.utp.backwebintegrado.lab.domain.LabResult;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
@@ -11,4 +13,7 @@ public interface LabMapper {
     @Mapping(target = "resultDetails", source = "labResult.details")
     @Mapping(target = "resultRecordedAt", source = "labResult.recordedAt")
     LabOrderResponse toResponse(LabOrder labOrder);
+
+    @Mapping(target = "labOrderId", source = "labOrder.id")
+    LabResultResponse toResultResponse(LabResult labResult);
 }
