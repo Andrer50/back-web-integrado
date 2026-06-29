@@ -26,7 +26,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @Service
@@ -295,7 +297,8 @@ public class ConsultationService {
     }
 
     private void validatePrimaryDiagnosisLimit(UUID consultationId, List<ConsultationDiagnosisRequest> requests) {
-        long existingPrimaryCount = diagnosisRepository.findByConsultationId(consultationId).stream()
+        List<ConsultationDiagnosis> existingDiagnoses = diagnosisRepository.findByConsultationId(consultationId);
+        long existingPrimaryCount = existingDiagnoses.stream()
                 .filter(diagnosis -> diagnosis.getType() == DiagnosisType.PRIMARY)
                 .count();
         long requestedPrimaryCount = requests.stream()
@@ -307,13 +310,32 @@ public class ConsultationService {
         if (existingPrimaryCount + requestedPrimaryCount > 1) {
             throw new ApiValidateException("La consulta solo puede tener un diagnóstico principal.");
         }
+
+        Set<String> diagnosisCodes = new HashSet<>();
+        existingDiagnoses.stream()
+                .map(ConsultationDiagnosis::getDiagnosis)
+                .filter(java.util.Objects::nonNull)
+                .map(Diagnosis::getIcd10)
+                .filter(java.util.Objects::nonNull)
+                .map(this::normalizeDiagnosisCode)
+                .forEach(diagnosisCodes::add);
+
+        for (ConsultationDiagnosisRequest request : requests) {
+            if (hasDiagnosisCode(request)
+                    && !diagnosisCodes.add(normalizeDiagnosisCode(request.getIcd10()))) {
+                throw new ApiValidateException(
+                        "El diagnóstico " + request.getIcd10().trim() + " ya está asociado a la consulta."
+                );
+            }
+        }
     }
 
     private ConsultationDiagnosis saveDiagnosis(Consultation consultation, ConsultationDiagnosisRequest request) {
-        Diagnosis diagnosisEntity = diagnosisEntityRepository.findByIcd10(request.getIcd10().trim().toUpperCase())
+        String diagnosisCode = normalizeDiagnosisCode(request.getIcd10());
+        Diagnosis diagnosisEntity = diagnosisEntityRepository.findByIcd10(diagnosisCode)
                 .orElseGet(() -> diagnosisEntityRepository.save(
                         Diagnosis.builder()
-                                .icd10(request.getIcd10().trim().toUpperCase())
+                                .icd10(diagnosisCode)
                                 .description(request.getDescription())
                                 .build()
                 ));
@@ -323,6 +345,10 @@ public class ConsultationService {
                 .diagnosis(diagnosisEntity)
                 .type(parseDiagnosisType(request.getType()))
                 .build());
+    }
+
+    private String normalizeDiagnosisCode(String code) {
+        return code.trim().toUpperCase();
     }
 
     private DiagnosisType parseDiagnosisType(String type) {

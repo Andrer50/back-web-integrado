@@ -29,13 +29,18 @@ public class LabOrderService {
     private final LabMapper labMapper;
 
     @Transactional(rollbackFor = Exception.class)
-    public List<LabOrderResponse> createOrders(UUID consultationId, List<LabOrderRequest> requests) {
+    public List<LabOrderResponse> createOrders(
+            UUID consultationId,
+            List<LabOrderRequest> requests,
+            String actorEmail,
+            List<String> roles) {
         if (requests == null || requests.isEmpty()) {
             throw new ApiValidateException("Debes indicar al menos un examen de laboratorio o imagen.");
         }
 
         Consultation consultation = consultationRepository.findById(consultationId)
                 .orElseThrow(() -> new ApiValidateException("Consulta no encontrada: " + consultationId));
+        assertCanManage(consultation, actorEmail, roles);
 
         return requests.stream()
                 .filter(this::hasName)
@@ -50,27 +55,52 @@ public class LabOrderService {
     }
 
     @Transactional(readOnly = true)
-    public List<LabOrderResponse> findByConsultationId(UUID consultationId) {
-        return labOrderRepository.findByConsultationId(consultationId).stream()
+    public List<LabOrderResponse> findVisibleOrders(String actorEmail, List<String> roles) {
+        List<LabOrder> orders;
+        if (hasRole(roles, "ADMIN")) {
+            orders = labOrderRepository.findAll();
+        } else if (hasRole(roles, "PATIENT")) {
+            orders = labOrderRepository.findByPatientEmail(actorEmail);
+        } else if (hasRole(roles, "DOCTOR")) {
+            orders = labOrderRepository.findByDoctorEmail(actorEmail);
+        } else {
+            throw new ApiValidateException("No tienes permiso para consultar órdenes de exámenes.");
+        }
+
+        return orders.stream()
                 .map(labMapper::toResponse)
                 .toList();
     }
 
     @Transactional(readOnly = true)
-    public LabOrderResponse findById(UUID id) {
-        return labOrderRepository.findById(id)
-                .map(labMapper::toResponse)
-                .orElseThrow(() -> new ApiValidateException("Orden de examen no encontrada: " + id));
+    public List<LabOrderResponse> findByConsultationId(
+            UUID consultationId,
+            String actorEmail,
+            List<String> roles) {
+        List<LabOrder> orders = labOrderRepository.findByConsultationId(consultationId);
+        orders.forEach(order -> assertCanView(order, actorEmail, roles));
+        return orders.stream().map(labMapper::toResponse).toList();
+    }
+
+    @Transactional(readOnly = true)
+    public LabOrderResponse findById(UUID id, String actorEmail, List<String> roles) {
+        LabOrder order = getOrder(id);
+        assertCanView(order, actorEmail, roles);
+        return labMapper.toResponse(order);
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public LabResultResponse recordResult(UUID labOrderId, LabResultRequest request) {
+    public LabResultResponse recordResult(
+            UUID labOrderId,
+            LabResultRequest request,
+            String actorEmail,
+            List<String> roles) {
         if (request == null || request.getDetails() == null || request.getDetails().isBlank()) {
             throw new ApiValidateException("El detalle del resultado es obligatorio.");
         }
 
-        LabOrder labOrder = labOrderRepository.findById(labOrderId)
-                .orElseThrow(() -> new ApiValidateException("Orden de examen no encontrada: " + labOrderId));
+        LabOrder labOrder = getOrder(labOrderId);
+        assertCanManage(labOrder.getConsultation(), actorEmail, roles);
 
         if (labOrder.getStatus() == LabOrderStatus.CANCELLED) {
             throw new ApiValidateException("No se puede registrar un resultado para una orden cancelada.");
@@ -89,6 +119,40 @@ public class LabOrderService {
         labOrderRepository.save(labOrder);
 
         return labMapper.toResultResponse(savedResult);
+    }
+
+    private LabOrder getOrder(UUID id) {
+        return labOrderRepository.findById(id)
+                .orElseThrow(() -> new ApiValidateException("Orden de examen no encontrada: " + id));
+    }
+
+    private void assertCanManage(Consultation consultation, String actorEmail, List<String> roles) {
+        if (hasRole(roles, "ADMIN")) {
+            return;
+        }
+        boolean ownsConsultation = hasRole(roles, "DOCTOR")
+                && consultation.getAppointment().getDoctor().getUser().getEmail().equalsIgnoreCase(actorEmail);
+        if (!ownsConsultation) {
+            throw new ApiValidateException("No tienes permiso para modificar esta orden de examen.");
+        }
+    }
+
+    private void assertCanView(LabOrder order, String actorEmail, List<String> roles) {
+        if (hasRole(roles, "ADMIN")) {
+            return;
+        }
+
+        boolean isOwnerPatient = hasRole(roles, "PATIENT")
+                && order.getConsultation().getAppointment().getPatient().getUser().getEmail().equalsIgnoreCase(actorEmail);
+        boolean isOwnerDoctor = hasRole(roles, "DOCTOR")
+                && order.getConsultation().getAppointment().getDoctor().getUser().getEmail().equalsIgnoreCase(actorEmail);
+        if (!isOwnerPatient && !isOwnerDoctor) {
+            throw new ApiValidateException("No tienes permiso para consultar esta orden de examen.");
+        }
+    }
+
+    private boolean hasRole(List<String> roles, String role) {
+        return roles != null && roles.contains(role);
     }
 
     private boolean hasName(LabOrderRequest request) {

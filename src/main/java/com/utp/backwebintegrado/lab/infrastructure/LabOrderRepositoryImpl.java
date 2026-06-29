@@ -26,6 +26,11 @@ public class LabOrderRepositoryImpl implements LabOrderRepository {
     }
 
     @Override
+    public List<LabOrder> findAll() {
+        return jpaRepository.findAllByOrderByOrderedAtDesc();
+    }
+
+    @Override
     public List<LabOrder> findByConsultationId(UUID consultationId) {
         return jpaRepository.findByConsultation_IdOrderByOrderedAtDesc(consultationId);
     }
@@ -33,5 +38,15 @@ public class LabOrderRepositoryImpl implements LabOrderRepository {
     @Override
     public List<LabOrder> findByPatientId(UUID patientId) {
         return jpaRepository.findByConsultation_Appointment_Patient_IdOrderByOrderedAtDesc(patientId);
+    }
+
+    @Override
+    public List<LabOrder> findByPatientEmail(String email) {
+        return jpaRepository.findByConsultation_Appointment_Patient_User_EmailOrderByOrderedAtDesc(email);
+    }
+
+    @Override
+    public List<LabOrder> findByDoctorEmail(String email) {
+        return jpaRepository.findByConsultation_Appointment_Doctor_User_EmailOrderByOrderedAtDesc(email);
     }
 }

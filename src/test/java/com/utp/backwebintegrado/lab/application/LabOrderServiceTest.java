@@ -1,6 +1,7 @@
 package com.utp.backwebintegrado.lab.application;
 
 import com.utp.backwebintegrado.clinical.domain.ConsultationRepository;
+import com.utp.backwebintegrado.lab.application.dto.LabOrderResponse;
 import com.utp.backwebintegrado.lab.application.dto.LabResultRequest;
 import com.utp.backwebintegrado.lab.application.dto.LabResultResponse;
 import com.utp.backwebintegrado.lab.domain.LabOrder;
@@ -18,6 +19,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -62,7 +64,12 @@ class LabOrderServiceTest {
         given(labOrderRepository.save(labOrder)).willReturn(labOrder);
         given(labMapper.toResultResponse(any(LabResult.class))).willReturn(expected);
 
-        LabResultResponse response = labOrderService.recordResult(labOrderId, request);
+        LabResultResponse response = labOrderService.recordResult(
+                labOrderId,
+                request,
+                "admin@mediconnect.pe",
+                List.of("ADMIN")
+        );
 
         ArgumentCaptor<LabResult> resultCaptor = ArgumentCaptor.forClass(LabResult.class);
         verify(labResultRepository).save(resultCaptor.capture());
@@ -87,11 +94,35 @@ class LabOrderServiceTest {
         given(labResultRepository.findByLabOrderId(labOrderId))
                 .willReturn(Optional.of(LabResult.builder().labOrder(labOrder).build()));
 
-        assertThatThrownBy(() -> labOrderService.recordResult(labOrderId, request))
+        assertThatThrownBy(() -> labOrderService.recordResult(
+                labOrderId,
+                request,
+                "admin@mediconnect.pe",
+                List.of("ADMIN")
+        ))
                 .isInstanceOf(ApiValidateException.class)
                 .hasMessage("La orden de examen ya tiene un resultado registrado.");
 
         verify(labResultRepository, never()).save(any());
         verify(labOrderRepository, never()).save(any());
+    }
+
+    @Test
+    void shouldReturnOnlyOrdersBelongingToAuthenticatedPatient() {
+        String patientEmail = "patient@mediconnect.pe";
+        LabOrder order = LabOrder.builder().id(UUID.randomUUID()).build();
+        LabOrderResponse expected = LabOrderResponse.builder().id(order.getId()).build();
+
+        given(labOrderRepository.findByPatientEmail(patientEmail)).willReturn(List.of(order));
+        given(labMapper.toResponse(order)).willReturn(expected);
+
+        List<LabOrderResponse> response = labOrderService.findVisibleOrders(
+                patientEmail,
+                List.of("PATIENT")
+        );
+
+        assertThat(response).containsExactly(expected);
+        verify(labOrderRepository).findByPatientEmail(patientEmail);
+        verify(labOrderRepository, never()).findAll();
     }
 }
