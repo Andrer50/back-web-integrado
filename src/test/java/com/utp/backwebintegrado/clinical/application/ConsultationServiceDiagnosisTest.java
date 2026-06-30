@@ -16,6 +16,7 @@ import com.utp.backwebintegrado.clinical.domain.DiagnosisRepository;
 import com.utp.backwebintegrado.clinical.domain.MedicationRepository;
 import com.utp.backwebintegrado.clinical.domain.PrescriptionRepository;
 import com.utp.backwebintegrado.clinical.infrastructure.mapper.ConsultationMapper;
+import com.utp.backwebintegrado.consultation.application.ConsultationService;
 import com.utp.backwebintegrado.lab.domain.LabOrderRepository;
 import com.utp.backwebintegrado.lab.infrastructure.LabMapper;
 import com.utp.backwebintegrado.patient.domain.AllergyRepository;
