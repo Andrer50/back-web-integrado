@@ -9,6 +9,13 @@ import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring")
 public interface LabMapper {
+    @Mapping(target = "consultationId", source = "consultation.id")
+    @Mapping(target = "patientId", source = "consultation.appointment.patient.id")
+    @Mapping(target = "patientFirstName", source = "consultation.appointment.patient.firstName")
+    @Mapping(target = "patientLastName", source = "consultation.appointment.patient.lastName")
+    @Mapping(target = "doctorFirstName", source = "consultation.appointment.doctor.firstName")
+    @Mapping(target = "doctorLastName", source = "consultation.appointment.doctor.lastName")
+    @Mapping(target = "appointmentDate", source = "consultation.appointment.appointmentDate")
     @Mapping(target = "status", expression = "java(labOrder.getStatus() != null ? labOrder.getStatus().name() : null)")
     @Mapping(target = "resultDetails", source = "labResult.details")
     @Mapping(target = "resultRecordedAt", source = "labResult.recordedAt")

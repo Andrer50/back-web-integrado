@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.UUID;
 
 @Data
@@ -14,6 +15,13 @@ import java.util.UUID;
 @AllArgsConstructor
 public class LabOrderResponse {
     private UUID id;
+    private UUID consultationId;
+    private UUID patientId;
+    private String patientFirstName;
+    private String patientLastName;
+    private String doctorFirstName;
+    private String doctorLastName;
+    private LocalDate appointmentDate;
     private String type;
     private String name;
     private String status;

@@ -6,7 +6,6 @@ import com.utp.backwebintegrado.audit.application.AuditService;
 import com.utp.backwebintegrado.consultation.application.dto.CompleteConsultationRequest;
 import com.utp.backwebintegrado.consultation.application.dto.ConsultationDiagnosisRequest;
 import com.utp.backwebintegrado.consultation.application.dto.ConsultationResponse;
-import com.utp.backwebintegrado.consultation.application.ConsultationService;
 import com.utp.backwebintegrado.consultation.domain.Consultation;
 import com.utp.backwebintegrado.consultation.domain.ConsultationDiagnosis;
 import com.utp.backwebintegrado.consultation.domain.ConsultationDiagnosisRepository;
@@ -17,6 +16,7 @@ import com.utp.backwebintegrado.clinical.domain.DiagnosisRepository;
 import com.utp.backwebintegrado.clinical.domain.MedicationRepository;
 import com.utp.backwebintegrado.consultation.domain.PrescriptionRepository;
 import com.utp.backwebintegrado.consultation.infrastructure.mapper.ConsultationMapper;
+import com.utp.backwebintegrado.consultation.application.ConsultationService;
 import com.utp.backwebintegrado.lab.domain.LabOrderRepository;
 import com.utp.backwebintegrado.lab.infrastructure.LabMapper;
 import com.utp.backwebintegrado.patient.domain.AllergyRepository;
@@ -108,6 +108,12 @@ class ConsultationServiceDiagnosisTest {
         assertThat(captor.getAllValues())
                 .extracting(ConsultationDiagnosis::getType)
                 .containsExactly(DiagnosisType.PRIMARY, DiagnosisType.SECONDARY);
+
+        ArgumentCaptor<Diagnosis> diagnosisCaptor = ArgumentCaptor.forClass(Diagnosis.class);
+        verify(diagnosisEntityRepository, org.mockito.Mockito.times(2)).save(diagnosisCaptor.capture());
+        assertThat(diagnosisCaptor.getAllValues())
+                .extracting(Diagnosis::getIcd10)
+                .containsExactly("J02.9", "R05");
     }
 
     @Test
@@ -130,6 +136,39 @@ class ConsultationServiceDiagnosisTest {
                 .hasMessage("La consulta solo puede tener un diagnóstico principal.");
 
         verify(diagnosisEntityRepository, never()).findByIcd10(any());
+        verify(diagnosisRepository, never()).save(any());
+    }
+
+    @Test
+    void shouldRejectDuplicateDiagnosisCodeInSameConsultation() {
+        UUID consultationId = UUID.randomUUID();
+        Appointment appointment = Appointment.builder()
+                .id(UUID.randomUUID())
+                .status(AppointmentStatus.CONFIRMED)
+                .build();
+        Consultation consultation = Consultation.builder()
+                .id(consultationId)
+                .appointment(appointment)
+                .build();
+        CompleteConsultationRequest request = new CompleteConsultationRequest();
+        request.setDiagnoses(List.of(
+                diagnosisRequest("R69", "Primer diagnóstico", "PRIMARY"),
+                diagnosisRequest("r69", "Segundo diagnóstico", "SECONDARY")
+        ));
+
+        given(consultationRepository.findById(consultationId)).willReturn(Optional.of(consultation));
+        given(diagnosisRepository.findByConsultationId(consultationId)).willReturn(List.of());
+
+        assertThatThrownBy(() -> consultationService.completeConsultation(
+                consultationId,
+                request,
+                "doctor@mediconnect.pe",
+                List.of("DOCTOR")
+        ))
+                .isInstanceOf(ApiValidateException.class)
+                .hasMessage("El diagnóstico r69 ya está asociado a la consulta.");
+
+        verify(diagnosisEntityRepository, never()).save(any());
         verify(diagnosisRepository, never()).save(any());
     }
 
