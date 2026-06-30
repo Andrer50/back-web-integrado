@@ -1,4 +1,4 @@
-package com.utp.backwebintegrado.clinical.domain;
+package com.utp.backwebintegrado.consultation.domain;
 
 import java.util.List;
 import java.util.Optional;

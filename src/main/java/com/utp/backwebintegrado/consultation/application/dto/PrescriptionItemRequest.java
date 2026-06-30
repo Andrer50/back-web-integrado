@@ -1,14 +1,9 @@
-package com.utp.backwebintegrado.clinical.application.dto;
+package com.utp.backwebintegrado.consultation.application.dto;
 
-import lombok.Builder;
 import lombok.Data;
 
-import java.util.UUID;
-
 @Data
-@Builder
-public class PrescriptionItemResponse {
-    private UUID id;
+public class PrescriptionItemRequest {
     private String medicationName;
     private String dosage;
     private String frequency;

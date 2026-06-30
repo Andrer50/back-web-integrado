@@ -1,9 +1,9 @@
-package com.utp.backwebintegrado.clinical.infrastructure.mapper;
+package com.utp.backwebintegrado.consultation.infrastructure.mapper;
 
-import com.utp.backwebintegrado.clinical.application.dto.PrescriptionItemResponse;
-import com.utp.backwebintegrado.clinical.application.dto.PrescriptionResponse;
-import com.utp.backwebintegrado.clinical.domain.Prescription;
-import com.utp.backwebintegrado.clinical.domain.PrescriptionItem;
+import com.utp.backwebintegrado.consultation.application.dto.PrescriptionItemResponse;
+import com.utp.backwebintegrado.consultation.application.dto.PrescriptionResponse;
+import com.utp.backwebintegrado.consultation.domain.Prescription;
+import com.utp.backwebintegrado.consultation.domain.PrescriptionItem;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 

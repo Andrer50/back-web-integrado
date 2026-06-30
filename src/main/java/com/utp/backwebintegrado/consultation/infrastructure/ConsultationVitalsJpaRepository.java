@@ -1,6 +1,6 @@
-package com.utp.backwebintegrado.clinical.infrastructure;
+package com.utp.backwebintegrado.consultation.infrastructure;
 
-import com.utp.backwebintegrado.clinical.domain.ConsultationVitals;
+import com.utp.backwebintegrado.consultation.domain.ConsultationVitals;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

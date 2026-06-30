@@ -1,8 +1,8 @@
-package com.utp.backwebintegrado.clinical.application;
+package com.utp.backwebintegrado.consultation.application;
 
-import com.utp.backwebintegrado.clinical.application.dto.PrescriptionResponse;
-import com.utp.backwebintegrado.clinical.domain.PrescriptionRepository;
-import com.utp.backwebintegrado.clinical.infrastructure.mapper.PrescriptionMapper;
+import com.utp.backwebintegrado.consultation.application.dto.PrescriptionResponse;
+import com.utp.backwebintegrado.consultation.domain.PrescriptionRepository;
+import com.utp.backwebintegrado.consultation.infrastructure.mapper.PrescriptionMapper;
 import com.utp.backwebintegrado.shared.exception.ApiValidateException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

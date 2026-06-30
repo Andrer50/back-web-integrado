@@ -1,7 +1,8 @@
 package com.utp.backwebintegrado.consultation.presentation;
 
-import com.utp.backwebintegrado.clinical.application.dto.*;
+import com.utp.backwebintegrado.consultation.application.dto.ConsultationResponse;
 import com.utp.backwebintegrado.consultation.application.ConsultationService;
+import com.utp.backwebintegrado.consultation.application.dto.*;
 import com.utp.backwebintegrado.shared.dto.ApiResponse;
 import com.utp.backwebintegrado.shared.utility.ConstantUtil;
 import lombok.RequiredArgsConstructor;

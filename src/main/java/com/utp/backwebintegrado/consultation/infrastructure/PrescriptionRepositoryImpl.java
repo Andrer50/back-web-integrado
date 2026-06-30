@@ -1,7 +1,7 @@
-package com.utp.backwebintegrado.clinical.infrastructure;
+package com.utp.backwebintegrado.consultation.infrastructure;
 
-import com.utp.backwebintegrado.clinical.domain.Prescription;
-import com.utp.backwebintegrado.clinical.domain.PrescriptionRepository;
+import com.utp.backwebintegrado.consultation.domain.Prescription;
+import com.utp.backwebintegrado.consultation.domain.PrescriptionRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 

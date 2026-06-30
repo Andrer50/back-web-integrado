@@ -1,4 +1,4 @@
-package com.utp.backwebintegrado.clinical.application.dto;
+package com.utp.backwebintegrado.consultation.application.dto;
 
 import com.utp.backwebintegrado.lab.application.dto.LabOrderRequest;
 import lombok.Data;

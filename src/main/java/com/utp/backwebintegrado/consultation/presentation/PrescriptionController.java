@@ -1,7 +1,7 @@
-package com.utp.backwebintegrado.clinical.presentation;
+package com.utp.backwebintegrado.consultation.presentation;
 
-import com.utp.backwebintegrado.clinical.application.PrescriptionService;
-import com.utp.backwebintegrado.clinical.application.dto.PrescriptionResponse;
+import com.utp.backwebintegrado.consultation.application.PrescriptionService;
+import com.utp.backwebintegrado.consultation.application.dto.PrescriptionResponse;
 import com.utp.backwebintegrado.shared.dto.ApiResponse;
 import com.utp.backwebintegrado.shared.utility.ConstantUtil;
 import lombok.RequiredArgsConstructor;

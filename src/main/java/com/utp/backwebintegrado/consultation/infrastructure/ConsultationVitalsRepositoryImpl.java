@@ -1,7 +1,7 @@
-package com.utp.backwebintegrado.clinical.infrastructure;
+package com.utp.backwebintegrado.consultation.infrastructure;
 
-import com.utp.backwebintegrado.clinical.domain.ConsultationVitals;
-import com.utp.backwebintegrado.clinical.domain.ConsultationVitalsRepository;
+import com.utp.backwebintegrado.consultation.domain.ConsultationVitals;
+import com.utp.backwebintegrado.consultation.domain.ConsultationVitalsRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
