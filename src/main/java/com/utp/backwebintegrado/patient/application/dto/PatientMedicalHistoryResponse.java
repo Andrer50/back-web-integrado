@@ -1,6 +1,6 @@
 package com.utp.backwebintegrado.patient.application.dto;
 
-import com.utp.backwebintegrado.clinical.application.dto.PrescriptionResponse;
+import com.utp.backwebintegrado.consultation.application.dto.PrescriptionResponse;
 import com.utp.backwebintegrado.lab.application.dto.LabOrderResponse;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

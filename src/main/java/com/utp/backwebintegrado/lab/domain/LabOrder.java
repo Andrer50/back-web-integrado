@@ -1,7 +1,7 @@
 package com.utp.backwebintegrado.lab.domain;
 
 import com.github.f4b6a3.uuid.UuidCreator;
-import com.utp.backwebintegrado.clinical.domain.Consultation;
+import com.utp.backwebintegrado.consultation.domain.Consultation;
 import com.utp.backwebintegrado.shared.enumeration.LabOrderStatus;
 import jakarta.persistence.*;
 import lombok.*;
