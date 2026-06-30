@@ -13,7 +13,6 @@ import com.utp.backwebintegrado.lab.application.dto.LabOrderResponse;
 import com.utp.backwebintegrado.patient.domain.AllergyRepository;
 import com.utp.backwebintegrado.consultation.domain.PrescriptionRepository;
 import com.utp.backwebintegrado.lab.domain.LabOrderRepository;
-import com.utp.backwebintegrado.lab.domain.LabOrder;
 import com.utp.backwebintegrado.patient.infrastructure.mapper.AllergyMapper;
 import com.utp.backwebintegrado.consultation.infrastructure.mapper.PrescriptionMapper;
 import com.utp.backwebintegrado.lab.infrastructure.LabMapper;

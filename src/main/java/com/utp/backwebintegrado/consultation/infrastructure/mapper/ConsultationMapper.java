@@ -12,7 +12,7 @@ import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring", uses = {PrescriptionMapper.class})
 public interface ConsultationMapper {
-
+    
     @Mapping(target = "appointmentId", source = "appointment.id")
     @Mapping(target = "patientFirstName", source = "appointment.patient.firstName")
     @Mapping(target = "patientLastName", source = "appointment.patient.lastName")

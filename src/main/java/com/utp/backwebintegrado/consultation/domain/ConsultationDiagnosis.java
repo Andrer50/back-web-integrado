@@ -1,7 +1,6 @@
 package com.utp.backwebintegrado.consultation.domain;
 
 import com.github.f4b6a3.uuid.UuidCreator;
-import com.utp.backwebintegrado.consultation.domain.Consultation;
 import com.utp.backwebintegrado.clinical.domain.Diagnosis;
 import com.utp.backwebintegrado.shared.enumeration.DiagnosisType;
 import jakarta.persistence.*;
