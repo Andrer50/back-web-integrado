@@ -7,6 +7,8 @@ import com.utp.backwebintegrado.shared.utility.ConstantUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -92,11 +94,16 @@ public class ConsultationController {
     @PostMapping("/{id}/complete")
     public ResponseEntity<ApiResponse<ConsultationResponse>> complete(
             @PathVariable UUID id,
-            @RequestBody CompleteConsultationRequest request) {
+            @RequestBody CompleteConsultationRequest request,
+            @AuthenticationPrincipal Jwt jwt) {
+
+        String email = jwt.getSubject();
+        List<String> roles = jwt.getClaimAsStringList("roles");
+
         return ResponseEntity.ok(ApiResponse.<ConsultationResponse>builder()
                 .code(ConstantUtil.OK_CODE)
                 .message(ConstantUtil.OK_MESSAGE)
-                .data(consultationService.completeConsultation(id, request))
+                .data(consultationService.completeConsultation(id, request, email, roles))
                 .build());
     }
 }

@@ -20,6 +20,7 @@ public interface ConsultationMapper {
     @Mapping(target = "vitals", ignore = true)
     @Mapping(target = "diagnoses", ignore = true)
     @Mapping(target = "prescription", ignore = true)
+    @Mapping(target = "labOrders", ignore = true)
     ConsultationResponse toResponse(Consultation consultation);
 
     @Mapping(target = "id", source = "consultation.id")
@@ -33,6 +34,7 @@ public interface ConsultationMapper {
     @Mapping(target = "vitals", source = "vitals")
     @Mapping(target = "diagnoses", source = "diagnoses")
     @Mapping(target = "prescription", source = "prescription")
+    @Mapping(target = "labOrders", ignore = true)
     ConsultationResponse toFullResponse(Consultation consultation, ConsultationVitals vitals, java.util.List<ConsultationDiagnosis> diagnoses, com.utp.backwebintegrado.clinical.domain.Prescription prescription);
 
     ConsultationVitalsResponse toVitalsResponse(ConsultationVitals vitals);
