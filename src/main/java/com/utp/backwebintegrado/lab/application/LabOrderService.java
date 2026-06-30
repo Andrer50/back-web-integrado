@@ -1,7 +1,7 @@
 package com.utp.backwebintegrado.lab.application;
 
-import com.utp.backwebintegrado.clinical.domain.Consultation;
-import com.utp.backwebintegrado.clinical.domain.ConsultationRepository;
+import com.utp.backwebintegrado.consultation.domain.Consultation;
+import com.utp.backwebintegrado.consultation.domain.ConsultationRepository;
 import com.utp.backwebintegrado.lab.application.dto.LabOrderRequest;
 import com.utp.backwebintegrado.lab.application.dto.LabOrderResponse;
 import com.utp.backwebintegrado.lab.application.dto.LabResultRequest;

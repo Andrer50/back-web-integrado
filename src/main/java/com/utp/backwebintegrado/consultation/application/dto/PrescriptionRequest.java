@@ -2,10 +2,10 @@ package com.utp.backwebintegrado.consultation.application.dto;
 
 import lombok.Data;
 
-import java.util.UUID;
+import java.util.List;
 
 @Data
-public class ConsultationRequest {
-    private UUID appointmentId;
+public class PrescriptionRequest {
     private String notes;
+    private List<PrescriptionItemRequest> items;
 }
